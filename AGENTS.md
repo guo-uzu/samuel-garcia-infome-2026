@@ -1,22 +1,16 @@
-## Development
+# Reglas para agentes
 
-When starting the dev server, use background mode:
+- Leer PLAN.md antes de trabajar.
+- Trabajar únicamente en la etapa solicitada.
+- No comenzar etapas posteriores.
+- No modificar código fuera del alcance salvo que sea necesario.
+- Ejecutar `pnpm build` antes de terminar.
+- No marcar una etapa como completada sin revisión.
 
-```
-astro dev --background
-```
+Al terminar una implementación, indicar:
 
-Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
-
-## Documentation
-
-Full documentation: https://docs.astro.build
-
-Consult these guides before working on related tasks:
-
-- [Adding pages, dynamic routes, or middleware](https://docs.astro.build/en/guides/routing/)
-- [Working with Astro components](https://docs.astro.build/en/basics/astro-components/)
-- [Using React, Vue, Svelte, or other framework components](https://docs.astro.build/en/guides/framework-components/)
-- [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
-- [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
-- [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+1. Qué cambió.
+2. Qué archivos se modificaron.
+3. Qué decisiones técnicas importantes se tomaron.
+4. Qué validaciones se ejecutaron.
+5. Qué debería revisar una persona.
