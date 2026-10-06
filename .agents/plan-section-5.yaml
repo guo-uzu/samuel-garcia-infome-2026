@@ -1,0 +1,236 @@
+artifact_version: "1.0"
+
+feature:
+  name: "Selector de proyectos (ProjectsCarousel)"
+  goal: "Centered-focus carousel of topic cards. The active card is enlarged (scale 1.5) and centered, neighbors stay at scale 1, it auto-advances every 5 s, and two orange round arrow buttons change slides manually. The arrow button is its own reusable component."
+  location: "New <ProjectsCarousel /> in src/pages/index.astro, immediately after <HeroCarousel /> inside <main id='contenido'>."
+
+source_of_truth:
+  visual_reference: "Provided screenshot (title, subtitle, row of 5 cards, arrows)"
+  user_requirements:
+    - "Images are in src/assets/secondCarousel/ (carousel-2-1..9.webp)"
+    - "Autoplay: advance to the next image every 5 s, as if playing"
+    - "Center card is scale 1.5, others scale 1"
+    - "Create a component for the orange arrow button"
+    - "Reuse global.css where possible"
+
+observations:
+  direct:
+    - "Centered heading 'LO NUEVO SÍ CUMPLE': condensed, heavy, uppercase, orange. Below it a one-line subtitle in dark gray-navy, regular weight: 'Selecciona el proyexto para saber más'."
+    - "Row of white cards on a white page. Each card has a photo on top and a centered uppercase orange label strip below. Radius is small (~0.5rem). A very light shadow/border is visible."
+    - "The center card (SEGURIDAD) is larger than its neighbors and sits on top of them. Its label is larger. The neighbors are MEDIO AMBIENTE, MOVILIDAD, with partial cards (ECONOMÍA, A…) cut off at the viewport edges."
+    - "The row bleeds past the container to the viewport edges. Cards are clipped by the screen, not by the content width."
+    - "Two orange circular buttons with a white chevron (‹ ›). They overlap the photo area, one at the left and one at the right of the row, vertically near the middle of the photo. They sit between the center and the cut-off outer cards, about 2 cards from center."
+    - "The photos are the files in secondCarousel. They are pure photos (800x800) with NO text baked in, so the label is live HTML text."
+  inferred:
+    - "Label per image (from viewing the files): 2-1 Seguridad (helicopter over building), 2-2 Medio ambiente (mural and flowers), 2-3 Economía (worker with hard hat), 2-4 Mujeres (Samuel with women in orange), 2-5 Agua (dam and boat), 2-6 Educación (colorful school campus), 2-7 Deporte (football with child), 2-8 Movilidad (metro train), 2-9 Salud/Infancia (child portrait). Labels for 2-4, 2-6, 2-7 and 2-9 are guesses."
+    - "Display order, taken from the screenshot: Economía, Medio ambiente, Seguridad, Movilidad, Agua (then the remaining four). It does NOT match file number order."
+    - "Wrap-around (infinite loop) is needed so autoplay never dead-ends."
+    - "Pause behavior, mobile sizing and the click action are not shown."
+    - "The screenshot's enlargement looks like ~1.2x. The user explicitly says 1.5, so use 1.5 (exposed as a CSS variable)."
+  uncertain:
+    - "Subtitle typo 'proyexto'. Assume the correct word is 'proyecto'."
+    - "Label font. It looks like a wide heavy sans, so --font-extended is the closest token."
+    - "Where a card leads when selected."
+
+repository_context:
+  relevant_files:
+    - "src/pages/index.astro (modify)"
+    - "src/styles/global.css (add a block before 'Utilidades globales')"
+    - "src/components/HeroCarousel.astro (reference for conventions: slides array, imports, inline <script>, Spanish aria text)"
+    - "src/assets/secondCarousel/*.webp"
+  reusable_components:
+    - ".container (for the heading block only, NOT for the card row)"
+  reusable_tokens:
+    - "--color-orange (arrow bg, label and title text), --color-orange-dark (arrow hover), --color-bg, --color-gray-dark (subtitle), --color-border"
+    - "--font-display (title), --font-extended (labels), --font-body (subtitle)"
+    - "--font-size-3xl (title), --font-size-md or --font-size-lg (subtitle), --font-size-xs/sm (labels)"
+    - "--radius-sm (cards), --radius-pill (arrows)"
+    - "--shadow-sm / --shadow-md (center card), --transition-base"
+    - "--space-xl (section padding-block, same as .intro/.carousel), --space-md, --space-lg"
+    - "Global h2 rule (display font, 700, tight line, text-wrap balance), global :focus-visible, global reduced-motion rule, .visually-hidden"
+  constraints:
+    - "HeroCarousel's script runs document.querySelectorAll('.carousel'). Do NOT use the .carousel or .carousel__* class names in the new component, or the two scripts will collide. Use the prefix .projects / .projects__*."
+    - "The arrow button is generic, so name it .carousel-arrow? No: use .arrow-btn so it does not match '.carousel'."
+    - "No libraries. Vanilla JS in an inline <script>, per the existing pattern. Tabs for indentation. Spanish copy."
+    - "Images are only 800x800, so no mobile variants exist."
+
+structure:
+  root: "<section class='projects' aria-roledescription='carrusel' aria-label='Proyectos del informe'>"
+  children:
+    - "div.container.projects__header > h2.projects__title 'Lo nuevo sí cumple' (CSS uppercase) + p.projects__subtitle"
+    - "div.projects__viewport (full-width, overflow hidden, position relative)"
+    - "  ul.projects__track (flex row, moved with transform: translateX)"
+    - "    li.projects__item x N (x3 sets for looping; clone sets aria-hidden='true' and inert) > button.projects-card (type='button')"
+    - "      div.projects-card__media > img"
+    - "      span.projects-card__label"
+    - "  ArrowButton direction='prev' and ArrowButton direction='next', absolutely positioned in the viewport"
+  semantic_notes:
+    - "The title is an <h2>. The page's single <h1> is already visually hidden in index.astro."
+    - "Data is a const array in the frontmatter: { label, src, alt, width, height }, in DISPLAY order."
+    - "The active card gets aria-current='true' (or a data-active attribute used for CSS)."
+
+layout:
+  container:
+    width: "Header uses .container. The viewport is 100% of the page width and bleeds to the screen edges."
+    max_width: "none for the viewport"
+    min_height: "content-driven"
+    overflow: "viewport: overflow hidden horizontally. Vertical padding must be large enough that the scaled center card is not clipped."
+  desktop:
+    model: "flex track, translated by JS so the active item is horizontally centered in the viewport"
+    columns: "5 cards visible (center + 2 each side), outer ones partially clipped, as in the screenshot"
+    alignment: "items align to the center vertically (align-items: center) so the 1.5 card grows up and down equally"
+    proportions: "Card width = clamp(9rem, 22vw, 15rem) via --projects-card-w. Photo area aspect-ratio ~1 / 0.95 with object-fit cover, label strip below with padding var(--space-xs) var(--space-2xs). Gap between cards must absorb the growth of the scaled card. Because transform does not change layout, use gap >= 0.3 x card width (e.g. calc(var(--projects-card-w) * 0.3)) so the 1.5 card does not hide its neighbors. Slight overlap is acceptable."
+  tablet:
+    behavior: "Same model. The card width token scales with vw, so 3 to 5 cards are visible."
+  mobile:
+    behavior: "Same model, ~2.5 cards visible. Keep --projects-active-scale at 1.5 by default. The Worker verifies the center card (9rem x 1.5 = 13.5rem) fits inside a 360px viewport with the arrows overlaid. If it clips, reduce only the mobile card width token. Do NOT change the scale."
+    stacking_order:
+      ["header (title, subtitle)", "viewport with track and arrows"]
+
+media:
+  assets:
+    [
+      "secondCarousel/carousel-2-1..9.webp, imported in the frontmatter in the same style as HeroCarousel (import x from '...'; use x.src, x.width, x.height)",
+    ]
+  sizing: "img width 100%, display block"
+  crop_behavior: "object-fit cover, object-position center, in a fixed-aspect box"
+  object_position: "center"
+  alignment: "top of card, full card width, top corners rounded by the card's overflow hidden"
+  notes:
+    - "loading='lazy' decoding='async' draggable='false'. Eager is not needed since the section is below the fold."
+    - "Alt text is descriptive Spanish, e.g. 'Seguridad: helicóptero estatal sobre un edificio de Nuevo León.'"
+
+content:
+  blocks:
+    - "Title: LO NUEVO SÍ CUMPLE"
+    - "Subtitle: Selecciona el proyecto para saber más"
+    - "Labels (display order): Economía, Medio ambiente, Seguridad, Movilidad, Agua, then Mujeres, Educación, Deporte, Salud (confirm, see open_questions)"
+  emphasis:
+    [
+      "Labels uppercase, bold, orange. The active label is visibly larger (comes for free from the scale).",
+    ]
+  copy_constraints:
+    [
+      "Long labels must not break the card. Allow wrapping in the label strip (text-wrap: balance) with a min-height so all cards have equal height.",
+    ]
+
+visual:
+  background: "Section transparent (page white). Card white (var(--color-bg))."
+  border_radius: "Cards var(--radius-sm). Arrows var(--radius-pill)."
+  border: "1px solid var(--color-border) on cards (or shadow only; one of them, not both)"
+  shadow: "Cards var(--shadow-sm). Active card var(--shadow-md). The screenshot shows only a faint shadow."
+  typography:
+    - "Title: --font-display, --font-size-3xl, uppercase, --color-orange, centered, line-height tight (inherited h2 rule)."
+    - "Subtitle: --font-body, --font-size-md (up to --font-size-lg on desktop), --color-gray-dark, centered, margin-top var(--space-2xs)."
+    - "Label: --font-extended, weight 800 (700 if 800 does not load), --font-size-xs on card (it becomes ~1.5x when active), uppercase, centered, --color-orange."
+  spacing:
+    - "Section padding-block var(--space-xl). Header to viewport gap var(--space-lg)."
+    - "Viewport padding-block ~ calc(var(--projects-card-w) * 0.3) so the scaled card has room top and bottom."
+  colors: ["orange: --color-orange", "arrow glyph: --color-text-inverse"]
+
+arrow_button_component:
+  file: "src/components/ArrowButton.astro"
+  props: "direction: 'prev' | 'next' (required), label: string (aria-label, required), class?: string (for positioning by the parent)"
+  markup: "<button type='button' class='arrow-btn arrow-btn--prev|next' aria-label={label}> with an inline SVG chevron (aria-hidden='true', stroke currentColor), no text glyph."
+  visual:
+    - "Circle ~2.5rem, background --color-orange, chevron --color-text-inverse, radius --radius-pill, no border, cursor pointer."
+    - "Hover/active: background --color-orange-dark, transition --transition-base. Focus: global :focus-visible (orange outline is poor on orange, so use outline-color var(--color-gray-dark) locally)."
+    - "Hit area >= 44px (same ::before trick used by .carousel__dot)."
+  placement: "The parent (.projects__viewport) positions them: position absolute, top ~ 40% of the photo height (vertically centered on the photo), prev at left calc(50% - 2 card widths) region, next mirrored, z-index above the cards. On mobile place at left/right viewport edges with var(--space-2xs) inset. Exact horizontal anchor: the gap between the center card and its 2nd neighbors, as in the screenshot."
+  styles_location: ".arrow-btn in global.css, in a new block 'Botón de flecha' before 'Utilidades globales'. It is generic and reusable."
+
+behavior:
+  autoplay:
+    - "Interval 5000 ms (const AUTOPLAY_MS = 5000). Advance to the next item (index + 1) with wrap-around."
+    - "Starts on load once the section is initialised."
+    - "Pause while the pointer is over the viewport or focus is inside it (focusin/focusout). Resume on leave."
+    - "Pause while document.hidden (visibilitychange)."
+    - "Do NOT autoplay when prefers-reduced-motion: reduce (WCAG 2.2.2). Manual controls still work."
+    - "Any manual action (arrow click, card click) restarts the 5 s timer."
+  positioning:
+    - "State: activeIndex over the base list (length N). Track holds 3 copies (3N items). The active item is the one in the middle copy."
+    - "On each change, compute translateX = viewportCenter - (activeItem.offsetLeft + activeItem.offsetWidth / 2). Apply it with transition: transform 500ms ease (token: 2.5 x --transition-base is fine, or a local 500ms)."
+    - "After the transition ends, if the active position left the middle copy, jump (no transition) by +-N items so it stays in the middle copy. Then re-enable the transition on the next frame."
+    - "Recompute on window resize (ResizeObserver on the viewport), without a transition."
+  active_styling:
+    - "Only the active item: transform scale(var(--projects-active-scale, 1.5)), z-index 2, shadow-md. All others: scale(1), z-index 1. Transition transform var(--transition-base) up to 500ms in sync with the track."
+    - "Define --projects-active-scale: 1.5 on .projects so it is tweakable."
+  interactions:
+    - "Arrow prev/next: previous/next item with wrap."
+    - "Click or Enter on a non-active card: make it the active one (center it). Clicking the active card does nothing in v1."
+    - "Keyboard: cards are buttons (Tab reachable). ArrowLeft/ArrowRight on the viewport also moves."
+    - "Touch swipe: optional, out of scope for v1."
+  scoping: "Script initialises per '.projects' root via querySelectorAll, with no global state."
+
+responsive_behavior:
+  rules:
+    - "All sizes derive from --projects-card-w. Title and spacing use existing fluid tokens."
+    - "Section must not create page-level horizontal scroll (viewport has overflow hidden; check at 320px)."
+    - "Arrows stay inside the viewport on every width."
+
+accessibility:
+  requirements:
+    - "Section aria-roledescription='carrusel' with label. Items role='group' aria-roledescription='diapositiva' aria-label='n de N'."
+    - "Cloned items: aria-hidden='true' and inert, with tabindex removed, so there are no duplicate tab stops or announcements."
+    - "Arrows have aria-label 'Proyecto anterior' / 'Proyecto siguiente'."
+    - "Do not put aria-live on the track while autoplay is on. Add a visible pause mechanism by hover/focus (above). Optional: a Play/Pause button is out of scope unless the user asks."
+    - "Images keep their alt. The label text is real text, so contrast of orange on white (#eb9012) is below 4.5:1 for small text. Note it as a known brand-color tradeoff. Labels are bold and ~14px+ scaled, so keep them bold."
+
+implementation_plan:
+  create:
+    - "src/components/ArrowButton.astro"
+    - "src/components/ProjectsCarousel.astro (frontmatter array, markup, inline script)"
+  modify:
+    - "src/pages/index.astro: import ProjectsCarousel, render it after <HeroCarousel />"
+    - "src/styles/global.css: add '.arrow-btn' block and a 'Selector de proyectos' block (.projects*, .projects-card*) before 'Utilidades globales'. Add the .projects__track transition override inside the existing reduced-motion pattern."
+  reuse:
+    [
+      "tokens and primitives listed under repository_context",
+      "the existing slides-array + <picture>/img conventions of HeroCarousel",
+      "the ::before 44px hit-area trick from .carousel__dot",
+    ]
+  avoid:
+    - "Using .carousel / .carousel__* class names (script collision with HeroCarousel)"
+    - "Editing HeroCarousel.astro or HeroIntro.astro"
+    - "Swiper or any dependency"
+    - "Native scroll-snap for this one (it fights with the centering transform and the scale effect)"
+    - "New hardcoded colors or font names"
+    - "Putting labels into the images or changing the image files"
+    - "Adding a play/pause UI, dots or captions that are not in the reference"
+  ordered_steps:
+    - "1. Create ArrowButton.astro and its global.css block."
+    - "2. Create ProjectsCarousel.astro with the data array in DISPLAY order and the 3-copy track (clones aria-hidden + inert)."
+    - "3. Add the section CSS: header, viewport, track, item, card, label, active state, arrow placement, reduced-motion."
+    - "4. Write the script: centering transform, wrap-around jump, active state, arrows, card click, 5000 ms autoplay with pause rules, resize handling."
+    - "5. Insert in index.astro below <HeroCarousel />."
+    - "6. Run `pnpm build`. Check in the browser at 360, 768 and 1280px: scale, no clipped center card, loop through all N without a visual jump, pause on hover, no console errors, HeroCarousel still works."
+
+acceptance_criteria:
+  - id: "AC1"
+    requirement: "The section renders directly under HeroCarousel, with the title and subtitle centered in .container and the card row bleeding to both viewport edges."
+  - id: "AC2"
+    requirement: "Exactly one card (the one centered) has scale 1.5 and sits above neighbors. All others have scale 1. Transitions between states are smooth."
+  - id: "AC3"
+    requirement: "Without any interaction, the active card changes to the next one every 5 seconds and loops forever without a visible jump."
+  - id: "AC4"
+    requirement: "Autoplay pauses on hover/focus and when the tab is hidden, and is disabled under prefers-reduced-motion. Any manual action restarts the 5 s timer."
+  - id: "AC5"
+    requirement: "Orange round prev/next buttons come from a reusable ArrowButton.astro component and move one card each way with wrap-around."
+  - id: "AC6"
+    requirement: "Clicking a non-active card centers it."
+  - id: "AC7"
+    requirement: "Cards are white with small radius, light shadow, photo on top and an orange uppercase label below. Fonts, colors, radii, spacing and shadows come from global.css tokens."
+  - id: "AC8"
+    requirement: "The scaled center card is not clipped vertically and does not cause page-level horizontal scroll at 320px and up."
+  - id: "AC9"
+    requirement: "Clones are hidden from assistive tech and tab order. Arrows, cards and the section have Spanish aria labels. Focus is visible on every control."
+  - id: "AC10"
+    requirement: "HeroCarousel behavior is unchanged (no class or script collision). `pnpm build` passes."
+
+open_questions:
+  - "Confirm the label for each image and the display order. My proposal (from the screenshot plus the photos): Economía (2-3), Medio ambiente (2-2), Seguridad (2-1), Movilidad (2-8), Agua (2-5), Mujeres (2-4), Educación (2-6), Deporte (2-7), Salud (2-9)."
+  - "Scale 1.5 is much bigger than the ~1.2 the screenshot suggests. Keep 1.5 as requested? It is a single CSS variable, so it is cheap to change."
+  - "Where does a card lead ('Selecciona el proyecto para saber más')? v1 only centers it. Provide URLs or a detail view if more is wanted."
+  - "Should the subtitle say 'proyecto' (assumed) instead of the screenshot's 'proyexto'?"
+  - "Autoplay on mobile and under reduced-motion: confirm it should be off for reduced-motion users (recommended)."
