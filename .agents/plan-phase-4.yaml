@@ -1,0 +1,173 @@
+artifact_version: "1.0"
+
+feature:
+  name: "Carrusel de destacados (HeroCarousel)"
+  goal: "Single-slide-at-a-time image carousel with a dot pager overlaid at the bottom center. Each slide is a full-bleed campaign image. Slide 1 is 'Nuevos Black Hawks - Lo nuevo sí cumple'."
+  location: "Directly below HeroIntro in src/pages/index.astro, inside <main id='contenido'>, after <HeroIntro />. It is a separate section, not part of HeroIntro.astro."
+
+source_of_truth:
+  visual_reference: "Provided screenshot (Black Hawk slide with pager)"
+  user_requirements:
+    - "Create the carousel shown in the image"
+    - "Place it below HeroIntro.astro"
+    - "Use the fonts and styles from src/styles/global.css"
+
+observations:
+  direct:
+    - "One wide rounded rectangle, about 16:9.2 (792x455, ratio ~1.74)."
+    - "Corner radii are asymmetric: top-left and bottom-right are large (~2.5rem). Top-right and bottom-left are small (~0). This is the same language as .intro__card."
+    - "The image is full-bleed inside the shape. The slide text ('NUEVOS BLACK HAWKS', 'LO NUEVO', 'SÍ CUMPLE', the 'Samuel García / Quinto Informe' logo) is baked into the image, not live HTML."
+    - "Pager sits bottom-center, overlapping the bottom edge. It is a small white tab with rounded top corners, flush to the bottom of the slide."
+    - "The pager has 7 dots. The active dot is orange, about 2x wider than the others, and the rest are a pale orange/peach."
+    - "No visible arrows, captions or borders."
+  inferred:
+    - "Auto-advance and swipe/scroll behavior are not visible. Proposed: native scroll-snap with the dots as controls."
+    - "The white tab is the same colour as the page background (#fff). It reads as a notch cut into the image."
+    - "The 7 slides are the existing Informe_2026_sg_imagenes-*.webp assets, or new ones to come."
+  uncertain:
+    - "Which asset is slide 1. The existing assets are 800x800 squares and the reference is ~1.74:1."
+    - "Whether slides link anywhere."
+    - "Whether it autoplays."
+
+repository_context:
+  relevant_files:
+    - "src/pages/index.astro"
+    - "src/components/HeroIntro.astro (reference only, do not modify)"
+    - "src/styles/global.css"
+    - "src/assets/Informe_2026_sg_imagenes-*.webp"
+  reusable_components: [".container (max-width var(--content-lg), padding-inline var(--gutter))"]
+  reusable_tokens:
+    - "--color-orange, --color-orange-soft, --color-bg, --color-text-inverse"
+    - "--radius-pill"
+    - "--space-xl (section padding-block, same as .intro), --space-2xs, --space-xs"
+    - "--transition-base"
+    - "Radius pattern from .intro__card: clamp(4rem, 7vw, 5rem) 0. Reuse it as 'clamp(2rem, 5vw, 3rem) 0' for a smaller card."
+    - ":focus-visible outline already global (orange)"
+  constraints:
+    - "Astro project with no framework integrations. Use vanilla JS in a small <script> only for dot sync and click-to-scroll."
+    - "Styles live in global.css, in a new '/* Carrusel */' block placed after the Hero/intro block and before 'Utilidades globales'. Follow the BEM style (.carousel__*) and tabs for indentation."
+    - "Respect prefers-reduced-motion. Global CSS already shortens transitions, so set scroll-behavior: auto for the track there."
+    - "Spanish copy and aria labels."
+
+structure:
+  root: "<section class='carousel' aria-roledescription='carrusel' aria-label='Destacados del informe'>"
+  children:
+    - "div.container"
+    - "  div.carousel__frame (position: relative, owns the radius and overflow:hidden)"
+    - "    ul.carousel__track (scroll-snap container)"
+    - "      li.carousel__slide x N (role='group', aria-roledescription='diapositiva', aria-label='1 de 7') > <img>"
+    - "    div.carousel__pager (the white tab) > button.carousel__dot x N"
+  semantic_notes:
+    - "Slides are data-driven: a const array in the Astro frontmatter ({src, alt}). Import images with astro:assets or relative imports, as HeroIntro does."
+    - "Dots are <button type='button' aria-label='Ir a la diapositiva n'> with aria-current='true' on the active one."
+    - "Add a visible-to-AT live-region-free approach: do not use aria-live."
+
+layout:
+  container:
+    width: "100% inside .container"
+    max_width: "var(--content-lg) via .container"
+    min_height: "none; height comes from aspect-ratio"
+    overflow: "hidden on .carousel__frame (clips image to radius)"
+  desktop:
+    model: "flex track with scroll-snap (scroll-snap-type: x mandatory), each slide flex: 0 0 100%"
+    columns: "1 visible slide, 100% width"
+    alignment: "Pager absolutely positioned: bottom 0, left 50%, translateX(-50%)"
+    proportions: "Frame aspect-ratio 16 / 9.2 (~1.74). Image uses object-fit: cover, object-position: center."
+  tablet:
+    behavior: "Same as desktop. Section padding-block var(--space-xl)."
+  mobile:
+    behavior: "Same single-slide layout. Aspect-ratio stays 16/9.2 if the art is baked-in text and fits. If the real art is a different ratio, the Worker changes the aspect-ratio value only. Radius uses clamp, so it shrinks. Pager dots stay at the same size (touch target is handled by padding, see below)."
+    stacking_order: ["frame (track)", "pager overlaid on frame"]
+
+media:
+  assets: ["Informe_2026_sg_imagenes-*.webp (7 of them, in filename order, unless the user provides the slide set)"]
+  sizing: "img width/height 100%, display block, drag disabled (draggable=false)"
+  crop_behavior: "object-fit: cover. Never stretch."
+  object_position: "center"
+  alignment: "Full-bleed in the frame"
+  notes:
+    - "First slide: loading='eager'. The others: loading='lazy', decoding='async'."
+    - "Give each img width/height attributes from the imported asset to prevent layout shift."
+
+content:
+  blocks:
+    - "No live text on slides (baked into the image). Each img needs a descriptive alt, e.g. slide 1: 'Nuevos Black Hawks. Lo nuevo sí cumple. Samuel García, Quinto Informe.'"
+  emphasis: []
+  copy_constraints: ["Alt text and aria labels in Spanish"]
+
+visual:
+  background: "Frame: var(--color-surface) behind images while they load. Pager tab: var(--color-bg)."
+  border_radius: "Frame: clamp(2rem, 5vw, 3rem) 0 (top-left and bottom-right large, others 0). Pager tab: top-left and top-right ~0.75rem (var(--radius-sm)), bottom 0."
+  border: "none"
+  shadow: "none (do not add)"
+  typography: ["No text, except visually-hidden labels"]
+  spacing:
+    - "Section padding-block: var(--space-xl)"
+    - "Pager: padding var(--space-xs) var(--space-md), dot gap var(--space-2xs)"
+  colors:
+    - "Inactive dot: var(--color-orange-soft) as the closest token. Check contrast on white. If it is too faint, use color-mix(in srgb, var(--color-orange) 35%, white)."
+    - "Active dot: var(--color-orange)"
+    - "Dot size: 0.75rem circle (~12px). Active: width 1.25rem, border-radius var(--radius-pill). Transition width/background with var(--transition-base)."
+
+responsive_behavior:
+  rules:
+    - "Track: display flex, overflow-x auto, scroll-snap-type x mandatory, scrollbar hidden (scrollbar-width none, ::-webkit-scrollbar display none), overscroll-behavior-x contain."
+    - "Slide: flex 0 0 100%, scroll-snap-align start."
+    - "Dots: each button has min 44x44 hit area through padding or ::before, with the visual dot smaller. The visual tab stays compact."
+    - "JS: an IntersectionObserver (threshold 0.6) or a scroll listener updates the active dot. Dot click calls slide.scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'})."
+    - "No autoplay in v1 (see open_questions)."
+    - "@media (prefers-reduced-motion: reduce): scroll-behavior auto on the track."
+
+accessibility:
+  requirements:
+    - "Section labelled, slides labelled 'n de N'."
+    - "Dots are real buttons with aria-label and aria-current. Keyboard focus is visible (global :focus-visible)."
+    - "Track is keyboard scrollable: tabindex='0' and aria-label on the track, plus the visible focus ring."
+    - "All images have non-empty alt."
+
+implementation_plan:
+  create:
+    - "src/components/HeroCarousel.astro (markup, slide data array, small inline <script>)"
+  modify:
+    - "src/pages/index.astro: import HeroCarousel and render it after <HeroIntro />"
+    - "src/styles/global.css: add '.carousel*' block"
+  reuse: [".container", "color/radius/space tokens listed above", "existing asset imports pattern"]
+  avoid:
+    - "Carousel libraries (Swiper etc.) or new dependencies"
+    - "Autoplay, arrows, shadows, gradients or captions not in the reference"
+    - "Changing HeroIntro.astro or its CSS"
+    - "New hardcoded colours or font families"
+    - "Re-rendering the baked-in text as HTML"
+  ordered_steps:
+    - "1. Inspect the assets and pick the slide images. Confirm slide 1 is the Black Hawks art (see open_questions). Otherwise use placeholders in filename order."
+    - "2. Create HeroCarousel.astro with the structure above and a typed slides array."
+    - "3. Add the CSS block to global.css (frame, track, slide, pager, dot, active dot, reduced-motion)."
+    - "4. Add the script for dot sync (IntersectionObserver) and click-to-scroll. Scope it to the component root so multiple instances would not clash."
+    - "5. Insert the component in index.astro below HeroIntro."
+    - "6. Run `pnpm build` and check in the browser at ~360px, ~768px and ~1280px."
+
+acceptance_criteria:
+  - id: "AC1"
+    requirement: "The carousel renders directly below the intro orange card, inside .container, with the same horizontal alignment as the .intro__card."
+  - id: "AC2"
+    requirement: "Frame has large radius on top-left and bottom-right only, others square. The image is clipped to it with no overflow."
+  - id: "AC3"
+    requirement: "Exactly one slide visible. Swipe, scroll and dot clicks move between slides and snap cleanly."
+  - id: "AC4"
+    requirement: "White pager tab is bottom-centered, flush with the bottom edge, with rounded top corners. It shows one dot per slide. The active dot is orange and wider, the rest are pale orange."
+  - id: "AC5"
+    requirement: "Active dot updates correctly on dot click, swipe and keyboard scroll."
+  - id: "AC6"
+    requirement: "All colors, radii and spacings come from global.css tokens. No new font declarations."
+  - id: "AC7"
+    requirement: "Images have alt, the first is eager and the rest lazy, with no layout shift. Dots are keyboard-operable with a visible focus ring and a 44px hit area."
+  - id: "AC8"
+    requirement: "No horizontal page overflow at 320px and up. Reduced-motion disables smooth scrolling."
+  - id: "AC9"
+    requirement: "`pnpm build` passes and HeroIntro is unchanged."
+
+open_questions:
+  - "Which image is slide 1? The reference art (Black Hawks) is not in src/assets and the existing webp files are 800x800 squares. Provide the 16:9-ish slide images, or confirm that the squares should be cropped with object-fit: cover."
+  - "How many slides? The reference shows 7 dots. Confirm the 7 slide images and their alt text."
+  - "Autoplay? Not in the reference, so the default is no. If wanted, suggest 6s with pause on hover/focus and none under reduced motion."
+  - "Should slides link anywhere (for example the Black Hawks story)? Default is no."
