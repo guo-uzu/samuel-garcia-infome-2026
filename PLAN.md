@@ -7,7 +7,7 @@ Se implementará y revisará una etapa completa antes de iniciar la siguiente. S
 ## Estado global
 
 - [x] 1. Base técnica y estilos globales
-- [ ] 2. Encabezado y navegación principal
+- [x] 2. Encabezado y navegación principal
 - [ ] 3. Hero y mensaje institucional
 - [ ] 4. Destacados y carrusel
 - [ ] 5. Selector de ejes y rutas internas
@@ -53,9 +53,9 @@ Se implementará y revisará una etapa completa antes de iniciar la siguiente. S
 
 **Validación antes de continuar**
 
-- [ ] La cabecera conserva contraste suficiente y no tapa contenido.
-- [ ] La marca es accionable con teclado y vuelve a `/`.
-- [ ] El placeholder puede sustituirse por un SVG/logo final desde un único componente.
+- [x] La cabecera conserva contraste suficiente y no tapa contenido.
+- [x] La marca es accionable con teclado y vuelve a `/`.
+- [x] El placeholder puede sustituirse por un SVG/logo final desde un único componente.
 
 **Si algo falla:** comprobar el `z-index`, los estilos de foco y el tamaño mínimo del enlace táctil.
 

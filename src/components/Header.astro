@@ -1,0 +1,23 @@
+---
+import { siteConfig } from '../config/site';
+import logo from '../assets/Informe_2026_sg-09.svg';
+---
+
+<header class="site-header">
+	<div class="container site-header__inner">
+		<a
+			class="site-header__brand"
+			href="/"
+			aria-label={`${siteConfig.title} — Ir al inicio`}
+		>
+			<img
+				class="site-header__logo"
+				src={logo.src}
+				alt=""
+				width={logo.width}
+				height={logo.height}
+				decoding="async"
+			/>
+		</a>
+	</div>
+</header>
