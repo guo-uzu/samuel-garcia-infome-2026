@@ -1,0 +1,223 @@
+artifact_version: "1.0"
+
+feature:
+  name: "Reports content fill (step 2)"
+  goal: "Pure data entry. Create the 9 MDX files in src/content/reports/ from the data below so every topic page is filled. No design decisions here."
+  prerequisite: "Step 1 (.agents/plan-reports.yaml) is implemented: mdx integration, content.config.ts, [id].astro, components Stat, Callout, Detail, report CSS."
+  location: "src/content/reports/<slug>.mdx"
+
+how_to_use:
+  - "One MDX file per entry under `pages`. File name = slug + '.mdx'."
+  - "Frontmatter keys: title, order, imageDesktop, imageMobile, imageAlt, description."
+  - "Image paths are relative to the MDX file: ../../assets/desktop/carousel-1-N-desktop.webp and ../../assets/mobile/carousel-1-N-mobile.webp"
+  - "Body is copied verbatim from the `body` block of each entry. Do not restyle, reorder or rewrite."
+  - "Components are NOT imported in MDX. They are passed by the page route."
+  - "Text comes from the mockups. Typos fixed on purpose: 'Américan Latina' -> 'América Latina', 'a la Mujeres' -> 'a las Mujeres'."
+  - "If a mockup footnote was hard to read, keep it as written here and flag it in the report."
+
+syntax_reference:
+  bullet: "- **Bold lead** rest of the sentence"
+  bullet_two_lines: "- **Title** <Detail>Second line</Detail>"
+  mid_subtitle: "## Text"
+  stat: "<Stat icon=\"medal\">**Primer Lugar** en Confianza</Stat>"
+  callout: "<Callout icon=\"hands\">…</Callout>"
+  footnote: "<small>(INEGI, 2025).</small>"
+  icons:
+    medal: "Primer Lugar"
+    police: "policías"
+    pointer: "Divisiones (verify the SVG is the crosshair)"
+    hands: "Reducción de la pobreza callout"
+
+pages:
+  - slug: economia
+    title: "Economía"
+    order: 1
+    image: 1
+    imageAlt: "Vista aérea de la aduana de Nuevo León con camiones cruzando."
+    description: "Economía de Nuevo León: primer lugar en inversión extranjera, empleo manufacturero e ingresos por hogar."
+    body: |
+      ## La aduana **más rápida y segura de México**
+
+      - **Primer Lugar en inversión extranjera** <Detail>136 billones de dólares</Detail>
+      - **Primer Lugar en generación de empleo manufacturero**
+      - **Primer Lugar en ingresos por hogar**
+      - **Primer Lugar en empleo IMMEX** <Detail>407,906 empleados registrados</Detail>
+      - **Primer lugar en formalidad laboral** <Detail>y la tasa más baja de informalidad <small>(INEGI, 2025).</small></Detail>
+
+  - slug: medio-ambiente
+    title: "Medio ambiente"
+    order: 2
+    image: 5
+    imageAlt: "Samuel García retira basura junto a voluntarios cerca de una vía del Metro."
+    description: "Medio ambiente en Nuevo León: más de un millón de árboles plantados, C5 Ambiental y red de monitoreo."
+    body: |
+      - Más de **1 millón de árboles** plantados
+      - Más de **10,000 toneladas** de basura retiradas
+      - **337 empresas** contaminantes suspendidas
+      - Nuevo **C5 Ambiental**
+      - Nueva **red de monitoreo** ambiental
+      - Nuevo **Centro Estatal de Atención Animal**
+      - **Primer lugar** en combate a incendios forestales
+
+  - slug: seguridad
+    title: "Seguridad"
+    order: 3
+    image: 6
+    imageAlt: "Samuel García camina frente a un helicóptero Black Hawk de la Guardia Estatal."
+    description: "Seguridad en Nuevo León: Nueva Fuerza Civil, nuevos Black Hawks y reducción de homicidios."
+    body: |
+      - **Nuevo Cuartel** General de la Nueva Fuerza Civil
+      - **17 Nuevos** Destacamentos
+      - **+1000 Nuevas** patrullas y **200 Nuevas** SUVs blindadas
+      - **+100 Nuevas** Black Mambas y vehículos Rhino
+      - **2 Nuevos** Black Hawks
+      - **10 Nuevos** Helicópteros
+
+      ## La Nueva Fuerza Civil, la mejor policía de México
+
+      <Stat icon="medal">**Primer Lugar** en Confianza (INEGI, 2026)</Stat>
+      <Stat icon="medal">**Primer Lugar** en Desempeño (INEGI, 2026)</Stat>
+      <Stat icon="police">**+7700** policías</Stat>
+      <Stat icon="pointer">**7 nuevas** Divisiones</Stat>
+
+      - **Los mejores resultados** de seguridad de los últimos 30 años
+      - Reducción de **-90% de homicidios** y delitos de alto impacto
+      - Nuevo León pasó del 4° al 24° lugar nacional en homicidios
+
+  - slug: movilidad
+    title: "Movilidad"
+    order: 4
+    image: 8
+    imageAlt: "Samuel García saluda con el puño a un joven dentro de un camión urbano."
+    description: "Movilidad en Nuevo León: 4300 nuevos camiones, nuevas líneas del Metro y siete nuevas carreteras."
+    body: |
+      - **4300 nuevos camiones** <Detail>y transmetros ecológicos, climatizados, con cámaras y hechos en Nuevo León.</Detail>
+      - **Nueva Línea 4, Línea 6 y Línea Aeropuerto** <Detail>el monorriel más largo de América Latina.</Detail>
+      - **Reconstrucción de la Línea 2 del Metro.**
+      - **22 nuevos trenes para la Línea 1.**
+      - **7 nuevas carreteras** <Detail>y vamos por una más</Detail>
+      - **Más de 400 nuevos parabuses**
+
+  - slug: agua
+    title: "Agua"
+    order: 5
+    image: 3
+    imageAlt: "Samuel García estrecha la mano de un hombre mayor en una lancha frente a la presa."
+    description: "Agua en Nuevo León: Nueva Presa León, Acueducto El Cuchillo II y primer lugar nacional en cobertura."
+    body: |
+      - **Nueva Presa León** <Detail>Con la cortina más larga de América Latina y capacidad de 8 presas la Boca</Detail>
+      - **Nuevo Acueducto El Cuchillo II** <Detail>100 kilómetros construidos en tiempo récord</Detail>
+      - **Nuevo Sistema de Modulación de Presiones**
+      - **Nuevo Tanque Nueva Castilla** <Detail>Y vamos por tres nuevos tanques para fortalecer la distribución de agua en García</Detail>
+
+      ## Superamos la crisis y hoy somos primer lugar nacional:
+
+      <Stat icon="medal">**Primer Lugar** en Cobertura de Agua Potable. 97.9% de los hogares tienen conexión a agua potable. <small>(INEGI, Encuesta Intercensal 2025).</small></Stat>
+      <Stat icon="medal">**Primer Lugar** en Cobertura de Alcantarillado 98.6%</Stat>
+
+  - slug: salud
+    title: "Salud"
+    order: 6
+    image: 4
+    imageAlt: "Samuel García saluda a un hombre en silla de ruedas entre sillas de ruedas nuevas."
+    description: "Salud en Nuevo León: infraestructura médica de primer nivel y atención médica gratuita."
+    body: |
+      ## Infraestructura médica hospitalaria de primer nivel:
+
+      - 3 Nuevas Unidades de Especialidades Médicas **(UNEME)**
+      - Nuevo **CESSA** San Pedro
+      - Nuevo **Hospital de Salud Mental** en Escobedo
+      - Nuevo **CITEA** y nuevo **TEA+** para el diagnóstico y atención al autismo
+      - Y vamos por el Nuevo **Hospital Infantil**
+
+      ## Atención médica gratuita:
+
+      - **1.3 millones de beneficiarios** del seguro universal gratuito **Cuidar Tu Salud**
+      - **Coberturas universales gratuitas** contra el cáncer de mama, cáncer infantil, sordera infantil, cardiopatías congénitas e infarto
+      - Red estatal de **espacios de lactancia**
+
+  - slug: ayudamos
+    title: "Ayudamos"
+    order: 7
+    image: 7
+    imageAlt: "Samuel García rodeado de mujeres con playeras naranjas durante un evento."
+    description: "Apoyos en Nuevo León: ayuda a las mujeres, útiles escolares, escuelas de tiempo completo y estancias infantiles."
+    body: |
+      - Ayudamos a las **Mujeres** con $2,000 mensuales y transporte gratis.
+      - **Ayudamos con útiles,** uniformes y calzado escolar gratuitos.
+      - **1,497 escuelas** de Tiempo Completo y Jornada Ampliada.
+      - Nuevos **Centros Comunitarios**
+      - Apoyamos a **118 estancias infantiles**
+
+      <Callout icon="hands">
+      **Primer Lugar en Reducción de la Pobreza**
+
+      776 mil personas salieron de la pobreza <small>(INEGI 2025).</small>
+      </Callout>
+
+  - slug: capullos
+    title: "Capullos"
+    order: 8
+    image: 9
+    imageAlt: "Samuel García conversa con niñas y niños con uniforme naranja en un espacio de juegos."
+    description: "Capullos en Nuevo León: nuevas villas, escuela, cocina y comedor, y procuraduría infantil."
+    body: |
+      - **20 Nuevas** Villas
+      - Nueva Villa Bebés
+      - Nuevo **Edificio de Terapia Física**
+      - Nueva **Escuela**
+      - Nueva **Cocina y Comedor**
+      - Nueva **Procuraduría Infantil**
+
+  - slug: espacios-publicos
+    title: "Espacios públicos"
+    order: 9
+    image: 2
+    imageAlt: "Samuel García juega fútbol con un niño frente al Nuevo Estadio Bicentenario."
+    description: "Espacios públicos en Nuevo León: Parque del Agua, 650 canchas de fútbol y Estadio Bicentenario."
+    body: |
+      - **Nuevo Parque del Agua**
+      - **650 nuevas canchas** de fútbol
+      - Nuevo **Estadio Bicentenario**
+      - Nuevo **Parque Niños Héroes**
+      - Nuevos **Corredores Verdes**
+      - Nuevos **Parques Lineales:** <Detail>Av. Constitución y Av. Morones Prieto</Detail>
+      - **Nuevo Parque Fundidora**
+
+frontmatter_template: |
+  ---
+  title: "<title>"
+  order: <order>
+  imageDesktop: "../../assets/desktop/carousel-1-<image>-desktop.webp"
+  imageMobile: "../../assets/mobile/carousel-1-<image>-mobile.webp"
+  imageAlt: "<imageAlt>"
+  description: "<description>"
+  ---
+
+  <body>
+
+ordered_steps:
+  - "1. Confirm step 1 is done and `pnpm build` passes with the Seguridad pilot."
+  - "2. Create the 9 MDX files with the template above. Seguridad may already exist from the pilot: keep it, do not duplicate it."
+  - "3. pnpm build. Fix any schema, image-path or MDX syntax error (watch for `<small>` or `<Detail>` inside list items, and blank lines around <Callout> content)."
+  - "4. Open each of the 9 pages in dist or the dev server and compare with the mockup: image pair, order of blocks, bold lead-ins, icons."
+  - "5. Report any text that could not be read from the mockups."
+
+acceptance_criteria:
+  - id: "AC1"
+    requirement: "Nine MDX files exist in src/content/reports, named by slug, each with the six required frontmatter fields."
+  - id: "AC2"
+    requirement: "Every page uses the correct desktop and mobile image pair per the `image` number."
+  - id: "AC3"
+    requirement: "Body text, bold lead-ins, two-line bullets, mid-subtitles, stats and the callout match this file."
+  - id: "AC4"
+    requirement: "Icons match the mapping: medal (Primer Lugar), police (policías), pointer (Divisiones), hands (pobreza)."
+  - id: "AC5"
+    requirement: "pnpm build passes and generates /economia, /medio-ambiente, /seguridad, /movilidad, /agua, /salud, /ayudamos, /capullos and /espacios-publicos."
+  - id: "AC6"
+    requirement: "No component, CSS or config file is changed in this step. Only MDX files are added."
+
+open_questions:
+  - "Footnote text such as '(INEGI, Encuesta Intercensal 2025).' was read from small mockup text. Verify against the original source."
+  - "'order' values follow the home carousel order (Economía, Medio ambiente, Seguridad, Movilidad, Agua) then Salud, Ayudamos, Capullos, Espacios públicos. Change if another order is wanted."
+  - "Descriptions and image alts are drafted from the mockups. Edit as needed."

@@ -1,0 +1,324 @@
+---
+import ArrowButton from "./ArrowButton.astro";
+import economia from "../assets/secondCarousel/carousel-2-3.webp";
+import medioAmbiente from "../assets/secondCarousel/carousel-2-2.webp";
+import seguridad from "../assets/secondCarousel/carousel-2-1.webp";
+import movilidad from "../assets/secondCarousel/carousel-2-8.webp";
+import agua from "../assets/secondCarousel/carousel-2-5.webp";
+import mujeres from "../assets/secondCarousel/carousel-2-4.webp";
+import educacion from "../assets/secondCarousel/carousel-2-6.webp";
+import deporte from "../assets/secondCarousel/carousel-2-7.webp";
+import salud from "../assets/secondCarousel/carousel-2-9.webp";
+
+interface Project {
+    label: string;
+    src: string;
+    alt: string;
+    width: number;
+    height: number;
+}
+
+const projects: Project[] = [
+    {
+        label: "Economía",
+        src: economia.src,
+        alt: "Economía: trabajador con casco de seguridad en una planta industrial de Nuevo León.",
+        width: economia.width,
+        height: economia.height,
+    },
+    {
+        label: "Medio ambiente",
+        src: medioAmbiente.src,
+        alt: "Medio ambiente: mural con huellas de mascotas y flores en Nuevo León.",
+        width: medioAmbiente.width,
+        height: medioAmbiente.height,
+    },
+    {
+        label: "Seguridad",
+        src: seguridad.src,
+        alt: "Seguridad: helicóptero de la Guardia Estatal sobre un edificio de Nuevo León.",
+        width: seguridad.width,
+        height: seguridad.height,
+    },
+    {
+        label: "Movilidad",
+        src: movilidad.src,
+        alt: "Movilidad: tren del Metro de Monterrey en movimiento.",
+        width: movilidad.width,
+        height: movilidad.height,
+    },
+    {
+        label: "Agua",
+        src: agua.src,
+        alt: "Agua: presa y embarcación en Nuevo León.",
+        width: agua.width,
+        height: agua.height,
+    },
+    {
+        label: "Mujeres",
+        src: mujeres.src,
+        alt: "Mujeres: Samuel García con mujeres en un evento comunitario.",
+        width: mujeres.width,
+        height: mujeres.height,
+    },
+    {
+        label: "Educación",
+        src: educacion.src,
+        alt: "Educación: campus escolar renovado con fachadas de colores.",
+        width: educacion.width,
+        height: educacion.height,
+    },
+    {
+        label: "Deporte",
+        src: deporte.src,
+        alt: "Deporte: Samuel García juega fútbol con un niño en un estadio.",
+        width: deporte.width,
+        height: deporte.height,
+    },
+    {
+        label: "Salud",
+        src: salud.src,
+        alt: "Salud: retrato de una niña sonriente en Nuevo León.",
+        width: salud.width,
+        height: salud.height,
+    },
+];
+
+const sets = [0, 1, 2];
+---
+
+<section
+    class="projects"
+    aria-roledescription="carrusel"
+    aria-label="Proyectos del informe"
+>
+    <div class="container projects__header">
+        <h2 class="projects__title">Lo nuevo sí cumple</h2>
+        <p class="projects__subtitle">Selecciona el proyecto para saber más</p>
+    </div>
+
+    <div class="projects__viewport">
+        <ul class="projects__track">
+            {sets.map((set) =>
+                projects.map((project, index) => (
+                    <li
+                        class="projects__item"
+                        role="group"
+                        aria-roledescription="diapositiva"
+                        aria-label={`${index + 1} de ${projects.length}`}
+                        aria-hidden={set !== 1 ? "true" : undefined}
+                        inert={set !== 1 ? true : undefined}
+                    >
+                        <button
+                            class="projects-card"
+                            type="button"
+                            data-index={index}
+                            tabindex={set !== 1 ? -1 : undefined}
+                        >
+                            <div class="projects-card__media">
+                                <img
+                                    src={project.src}
+                                    alt={project.alt}
+                                    width={project.width}
+                                    height={project.height}
+                                    loading="lazy"
+                                    decoding="async"
+                                    draggable="false"
+                                />
+                            </div>
+                            <span class="projects-card__label">
+                                {project.label}
+                            </span>
+                        </button>
+                    </li>
+                )),
+            )}
+        </ul>
+
+        <ArrowButton
+            direction="prev"
+            label="Proyecto anterior"
+            class="projects__arrow projects__arrow--prev"
+        />
+        <ArrowButton
+            direction="next"
+            label="Proyecto siguiente"
+            class="projects__arrow projects__arrow--next"
+        />
+    </div>
+</section>
+
+<script>
+    const AUTOPLAY_MS = 5000;
+    const INITIAL_INDEX = 0;
+
+    function initProjects(root: HTMLElement) {
+        const viewport = root.querySelector<HTMLElement>(".projects__viewport");
+        const track = root.querySelector<HTMLElement>(".projects__track");
+
+        if (!viewport || !track) return;
+
+        const items = Array.from(
+            track.querySelectorAll<HTMLElement>(".projects__item"),
+        );
+        const prevBtn = root.querySelector(".projects__arrow--prev");
+        const nextBtn = root.querySelector(".projects__arrow--next");
+        const count = items.length / 3;
+        const reducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+        );
+
+        if (!count || count !== Math.floor(count)) return;
+
+        let domIndex = count + INITIAL_INDEX;
+        let timer: number | undefined;
+
+        const baseIndex = () => ((domIndex % count) + count) % count;
+
+        const applyActive = () => {
+            const base = baseIndex();
+
+            items.forEach((item, i) => {
+                if (i === domIndex) {
+                    item.setAttribute("data-active", "true");
+                } else {
+                    item.removeAttribute("data-active");
+                }
+
+                const card = item.querySelector(".projects-card");
+                if (!card) return;
+
+                if (i === count + base) {
+                    card.setAttribute("aria-current", "true");
+                } else {
+                    card.removeAttribute("aria-current");
+                }
+            });
+        };
+
+        const center = (withTransition: boolean) => {
+            const target = items[domIndex];
+            if (!target) return;
+
+            const delta =
+                viewport.clientWidth / 2 -
+                (target.offsetLeft + target.offsetWidth / 2);
+
+            if (withTransition) {
+                track.style.removeProperty("transition");
+            } else {
+                track.style.transition = "none";
+            }
+
+            track.style.transform = `translateX(${delta}px)`;
+
+            if (!withTransition) {
+                requestAnimationFrame(() =>
+                    track.style.removeProperty("transition"),
+                );
+            }
+        };
+
+        const currentTranslateX = () => {
+            const transform = getComputedStyle(track).transform;
+            if (transform === "none") return 0;
+            return new DOMMatrixReadOnly(transform).m41;
+        };
+
+        const normalize = () => {
+            if (domIndex >= count && domIndex < count * 2) return;
+
+            const shift = domIndex >= count * 2 ? -count : count;
+            const step = items[1].offsetLeft - items[0].offsetLeft;
+
+            domIndex += shift;
+            track.style.transition = "none";
+            track.style.transform = `translateX(${currentTranslateX() - shift * step}px)`;
+            requestAnimationFrame(() =>
+                track.style.removeProperty("transition"),
+            );
+        };
+
+        const goTo = (newDomIndex: number, withTransition = true) => {
+            normalize();
+
+            domIndex = newDomIndex;
+            applyActive();
+            center(withTransition);
+        };
+
+        const stopTimer = () => {
+            if (timer !== undefined) {
+                window.clearInterval(timer);
+                timer = undefined;
+            }
+        };
+
+        const startTimer = () => {
+            stopTimer();
+            if (reducedMotion.matches || document.hidden) return;
+            timer = window.setInterval(() => goTo(domIndex + 1), AUTOPLAY_MS);
+        };
+
+        prevBtn?.addEventListener("click", () => {
+            goTo(domIndex - 1);
+            startTimer();
+        });
+
+        nextBtn?.addEventListener("click", () => {
+            goTo(domIndex + 1);
+            startTimer();
+        });
+
+        track.addEventListener("click", (event) => {
+            const card = (event.target as Element).closest(".projects-card");
+            if (!card) return;
+
+            const index = Number((card as HTMLElement).dataset.index);
+            if (Number.isNaN(index)) return;
+
+            goTo(count + index);
+            startTimer();
+        });
+
+        viewport.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                goTo(domIndex - 1);
+                startTimer();
+            } else if (event.key === "ArrowRight") {
+                event.preventDefault();
+                goTo(domIndex + 1);
+                startTimer();
+            }
+        });
+
+        viewport.addEventListener("pointerenter", stopTimer);
+        viewport.addEventListener("pointerleave", startTimer);
+        viewport.addEventListener("focusin", stopTimer);
+        viewport.addEventListener("focusout", startTimer);
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+        });
+
+        track.addEventListener("transitionend", (event) => {
+            if (event.target !== track || event.propertyName !== "transform")
+                return;
+            normalize();
+        });
+
+        const resizeObserver = new ResizeObserver(() => center(false));
+        resizeObserver.observe(viewport);
+
+        applyActive();
+        center(false);
+        startTimer();
+    }
+
+    document.querySelectorAll<HTMLElement>(".projects").forEach(initProjects);
+</script>

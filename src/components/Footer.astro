@@ -1,0 +1,58 @@
+---
+import { siteConfig } from "../config/site";
+import footerLogo from "../assets/footerLogo.svg";
+import facebook from "../assets/facebook.svg";
+import instagram from "../assets/instagram.svg";
+import x from "../assets/x.svg";
+
+const socials = [
+    {
+        name: siteConfig.social.facebook.label,
+        href: siteConfig.social.facebook.url,
+        icon: facebook,
+    },
+    {
+        name: siteConfig.social.instagram.label,
+        href: siteConfig.social.instagram.url,
+        icon: instagram,
+    },
+    { name: siteConfig.social.x.label, href: siteConfig.social.x.url, icon: x },
+];
+---
+
+<footer class="site-footer">
+    <div class="container site-footer__inner">
+        <img
+            class="site-footer__logo"
+            src={footerLogo.src}
+            alt="Samuel García, Quinto Informe"
+            width={footerLogo.width}
+            height={footerLogo.height}
+            loading="lazy"
+            decoding="async"
+        />
+        <ul class="site-footer__social">
+            {socials.map((social) => (
+                <li>
+                    <a
+                        class="site-footer__link"
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={social.name}
+                    >
+                        <img
+                            class="site-footer__icon"
+                            src={social.icon.src}
+                            alt={social.name}
+                            width={social.icon.width}
+                            height={social.icon.height}
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    </a>
+                </li>
+            ))}
+        </ul>
+    </div>
+</footer>

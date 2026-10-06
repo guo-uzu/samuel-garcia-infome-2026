@@ -27,18 +27,18 @@ export const siteConfig = {
 	social: {
 		facebook: {
 			label: 'Facebook',
-			status: 'coming-soon',
-			url: null,
+			status: 'ready',
+			url: 'https://www.facebook.com/gobiernonuevoleon',
 		} satisfies SocialLink,
 		instagram: {
 			label: 'Instagram',
-			status: 'coming-soon',
-			url: null,
+			status: 'ready',
+			url: 'https://www.instagram.com/nuevoleonmx/',
 		} satisfies SocialLink,
 		x: {
 			label: 'X',
-			status: 'coming-soon',
-			url: null,
+			status: 'ready',
+			url: 'https://x.com/nuevoleon',
 		} satisfies SocialLink,
 	},
 } as const;

@@ -1,0 +1,183 @@
+artifact_version: "1.0"
+
+feature:
+  name: "Footer del sitio (SiteFooter)"
+  goal: "Orange footer with the white 'Samuel García - Quinto Informe' logo centered, and a row of three social icon links (Facebook, Instagram, X) below it. It appears on every page."
+  location: "New src/components/Footer.astro, rendered in src/layouts/Layout.astro right after <slot />, inside <body>. Same pattern as <Header />."
+
+source_of_truth:
+  visual_reference: "Provided screenshot (1282px wide, ~497px tall). The thin white horizontal line between the logo and the icons is IGNORED, as requested."
+  user_requirements:
+    - "Top logo: src/assets/footerLogo.svg"
+    - "Social icons: src/assets/facebook.svg, instagram.svg, x.svg"
+    - "Facebook: https://www.facebook.com/gobiernonuevoleon"
+    - "Instagram: https://www.instagram.com/nuevoleonmx/"
+    - "X: https://x.com/nuevoleon"
+    - "Each link has target='_blank' and a title with the social network name"
+    - "Placed in the Layout, so it shows on every page"
+    - "Follow the styles in global.css"
+
+observations:
+  direct:
+    - "Solid orange background, full viewport width, square corners (no radius)."
+    - "Logo is white, horizontally centered, ~52% of the width at 1282px (~668px). It has a lot of space above (~115px) and below it (~115px)."
+    - "Icons row is centered, below the logo. Three rounded-square white icons with an orange glyph. Each is ~36px at 1282px wide, with ~39px of space between them."
+    - "Space above the icons ~35px, below ~50px."
+    - "No text, no copyright line, no extra links."
+  inferred:
+    - "Logo size, paddings and gaps become fluid values with clamp/tokens (not pixel copies)."
+    - "Mobile: same stacked layout, logo gets narrower."
+    - "Hover/focus states are not shown. Propose a subtle one only (see visual)."
+  uncertain:
+    - "The screenshot orange (~#fb8c00) is a bit more saturated than --color-orange (#eb9012). Assume the repo token is the intended brand color, matching .site-header and .intro__card."
+
+repository_context:
+  relevant_files:
+    - "src/layouts/Layout.astro (modify: import Footer, render after <slot />)"
+    - "src/components/Header.astro (reference: imports svg, uses img with logo.src/width/height, 'container' primitive, BEM class names)"
+    - "src/styles/global.css (add a 'Pie de página' block before 'Utilidades globales')"
+    - "src/config/site.ts (siteConfig has title, url, lang, description. Optional place for the social links)"
+    - "src/assets/footerLogo.svg (viewBox 993.75x203.64, ~4.9:1, fill #fff)"
+    - "src/assets/facebook.svg, instagram.svg, x.svg (each viewBox 52.82 square, white rounded rect with #ff6500 glyph baked in)"
+  reusable_components: [".container", "Header.astro conventions"]
+  reusable_tokens:
+    - "--color-orange (background), --color-text-inverse, --color-orange-dark"
+    - "--space-xl / --space-2xl / --space-3xl (vertical padding), --space-lg / --space-md / --space-sm (gaps)"
+    - "--transition-base, --radius-sm"
+    - "global :focus-visible (orange outline is invisible on an orange background, so override the outline color locally, as .site-header__brand:focus-visible does with var(--color-text-inverse))"
+    - ".visually-hidden"
+  constraints:
+    - "The social SVGs already include the white tile and the orange glyph. Do NOT wrap them in another tile/background or recolor them."
+    - "Import SVGs the way Header does: `import x from '../assets/x.svg'` and use x.src/x.width/x.height in a plain <img>."
+    - "The page <main> and header already exist. Footer is a <footer>, a sibling of <main>, not inside it."
+    - "Class names: use a new prefix .site-footer (mirrors .site-header). Do not use .carousel, .projects or .arrow-btn."
+    - "No JS."
+
+structure:
+  root: "<footer class='site-footer'>"
+  children:
+    - "div.container.site-footer__inner"
+    - "  img.site-footer__logo (footerLogo.svg), centered"
+    - "  ul.site-footer__social (list of 3 <li>)"
+    - "    li > a.site-footer__link[href][target='_blank'][rel='noopener noreferrer'][title='Facebook'] > img.site-footer__icon[alt='Facebook']"
+    - "    (same for Instagram, X)"
+  semantic_notes:
+    - "<footer> is the page-level contentinfo landmark."
+    - "Social links in a <ul> (reset by global ul rule)."
+    - "Social data is an array in the frontmatter: { name, href, icon }. Order: Facebook, Instagram, X."
+    - "Optional: store the array in src/config/site.ts as siteConfig.social if the Worker finds it consistent with that file. Otherwise keep it local to Footer.astro."
+
+layout:
+  container:
+    width: "100% (full-bleed background), content inside .container"
+    max_width: "var(--content-lg) via .container"
+    min_height: "content-driven"
+    overflow: "visible"
+  desktop:
+    model: "flex column"
+    columns: "1"
+    alignment: "align-items center, justify-content center, text-align center"
+    proportions: "Logo width ~52% of the container, with max-width ~42rem (about 672px). Icons 2.25rem square. Gap between icons var(--space-lg)-ish (about 2.4rem, use var(--space-lg) = 2rem or 2.5rem if the Worker needs a closer match). Gap between logo and icons var(--space-lg)."
+  tablet:
+    behavior: "Same layout. Logo width ~60%."
+  mobile:
+    behavior: "Same stacked layout. Logo width ~80% of the container (min 14rem). Icons keep 2.25rem with ~var(--space-md) between them. Vertical padding shrinks through the fluid token."
+    stacking_order: ["logo", "social icons"]
+
+media:
+  assets: ["footerLogo.svg", "facebook.svg", "instagram.svg", "x.svg"]
+  sizing: "Logo: width: min(100%, 42rem) with width:60%/80% rules per breakpoint, height auto. Icons: width/height 2.25rem."
+  crop_behavior: "none, SVGs are shown whole"
+  object_position: "n/a"
+  alignment: "centered"
+  notes:
+    - "Give every <img> intrinsic width/height attributes from the import to avoid layout shift."
+    - "Logo: alt='Samuel García, Quinto Informe', it is informative."
+    - "Icons: alt = network name. The link also has title = network name."
+    - "loading='lazy' decoding='async' on all of them (footer is below the fold)."
+
+content:
+  blocks:
+    - "Logo"
+    - "Three icon links"
+  emphasis: []
+  copy_constraints:
+    - "title values exactly: 'Facebook', 'Instagram', 'X'"
+
+visual:
+  background: "var(--color-orange)"
+  border_radius: "none"
+  border: "none (the white divider line in the reference is intentionally not built)"
+  shadow: "none"
+  typography: ["No visible text"]
+  spacing:
+    - "Footer padding-top and padding-bottom: roughly the 115px/50px of the reference translate to padding-block: var(--space-2xl) at the top and var(--space-xl) at the bottom (clamped by tokens)."
+    - "Logo to icons: var(--space-lg)."
+    - "Between icons: var(--space-lg)."
+  colors: ["background: --color-orange", "logo is already white in the SVG"]
+  interaction:
+    - "Hover: opacity or small translateY on the link, using var(--transition-base). Keep subtle, nothing in the reference requires it."
+    - "Focus-visible: outline-color var(--color-text-inverse), outline-offset 2px, radius var(--radius-sm)."
+    - "Link hit area at least 44px (use the ::before trick used in .arrow-btn or padding on the <a>)."
+
+responsive_behavior:
+  rules:
+    - "No horizontal overflow at 320px."
+    - "Logo never exceeds its container width."
+    - "The three icons always fit on one row, down to 320px."
+
+accessibility:
+  requirements:
+    - "target='_blank' links must have rel='noopener noreferrer'."
+    - "Name for each link comes from title and from the img alt. Do not leave alt empty (the title alone is unreliable for screen readers)."
+    - "Optional: add a visually-hidden ' (se abre en una pestaña nueva)' to each link. Mention it as an enhancement. Title and alt remain exactly the network name."
+    - "Focus ring must be visible on orange."
+    - "<footer> is a landmark. Skip-link target #contenido is unaffected."
+
+implementation_plan:
+  create:
+    - "src/components/Footer.astro"
+  modify:
+    - "src/layouts/Layout.astro: import Footer from '../components/Footer.astro'; render <Footer /> right after <slot /> in <body>."
+    - "src/styles/global.css: add '.site-footer*' block in a section titled 'Pie de página', placed after 'Selector de proyectos' and before 'Utilidades globales'."
+    - "src/config/site.ts (optional): add social links, only if keeping data there reads well."
+  reuse:
+    - ".container, color/space/radius/transition tokens, :focus-visible, existing Header import-and-<img> pattern"
+  avoid:
+    - "Putting the footer in index.astro (it must be in the Layout so every page gets it)"
+    - "Recoloring or re-wrapping the social SVGs"
+    - "Building the white divider line"
+    - "Adding copyright text, extra links, newsletter or other content not in the reference"
+    - "Using an <svg> inline copy of the logo (use the asset file like Header does)"
+    - "New hardcoded colors or fonts"
+  ordered_steps:
+    - "1. Read src/config/site.ts and decide where the social array lives."
+    - "2. Create Footer.astro: imports, social array, markup per 'structure'."
+    - "3. Add the global.css block: footer background and padding, flex centering, logo sizing, icon list, link states, breakpoints."
+    - "4. Import and render <Footer /> in Layout.astro after <slot />."
+    - "5. Run `pnpm build`. Check 360, 768 and 1280px: centered logo, 3 icons in one row, hrefs open in a new tab, titles appear on hover."
+
+acceptance_criteria:
+  - id: "AC1"
+    requirement: "Footer renders from Layout.astro on every page, below all page content and full-width."
+  - id: "AC2"
+    requirement: "Background is var(--color-orange). No divider line is built."
+  - id: "AC3"
+    requirement: "Logo is footerLogo.svg, centered, about half the container width on desktop (capped ~42rem), narrower on mobile, with generous space above and below."
+  - id: "AC4"
+    requirement: "Three icons (facebook, instagram, x) in that order, centered in one row below the logo, ~2.25rem each with even spacing."
+  - id: "AC5"
+    requirement: "Each icon link points to its given URL, has target='_blank' and rel='noopener noreferrer', and title equals 'Facebook', 'Instagram' or 'X'."
+  - id: "AC6"
+    requirement: "Icons keep their original white tile and orange glyph (SVGs unmodified)."
+  - id: "AC7"
+    requirement: "Keyboard focus is clearly visible on the orange background, and each link has a hit area of at least 44px."
+  - id: "AC8"
+    requirement: "Only existing tokens and classes are used for color, spacing, radius and transition. No new fonts or hardcoded colors."
+  - id: "AC9"
+    requirement: "No horizontal overflow at 320px. `pnpm build` passes. Header and the other sections are unchanged."
+
+open_questions:
+  - "Pages shorter than the viewport will leave the footer floating mid-screen (body has min-height: 100vh but is not a flex column). Do you want a sticky-bottom footer (body flex column, main flex: 1)? Default: no, since it is not in the reference."
+  - "The icon glyph color baked in the SVGs is #ff6500, slightly redder than the footer's --color-orange. Keep the SVGs untouched (default), or recolor them to match?"
+  - "Should the links also carry a visually-hidden 'se abre en una pestaña nueva' hint? Default: no, only title and alt as requested."

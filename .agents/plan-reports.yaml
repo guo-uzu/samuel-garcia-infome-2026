@@ -1,0 +1,218 @@
+artifact_version: "1.0"
+
+feature:
+  name: "Páginas de informe por tema (reports content collection)"
+  goal: "Nine topic pages (Seguridad, Movilidad, Agua, Salud, Ayudamos, Capullos, Espacios públicos, Economía, Medio ambiente) rendered from a build-time content collection of MDX files. Each page: video placeholder, hero image (desktop/mobile art), 'LO NUEVO SÍ CUMPLE' + topic name, then flexible MDX content. Rendered at build time and served as static HTML. No adapter."
+  location: "src/content.config.ts, src/content/reports/*.mdx, src/pages/[id].astro, new components under src/components/"
+
+source_of_truth:
+  visual_reference: "Nine mobile-width mockups supplied by the user (one per topic)"
+  user_requirements:
+    - "Content collection in src/content/reports as .mdx, to keep info and pages flexible"
+    - "Follow the build-time collection guide: https://v7-2.previews.docs.astro.build/en/guides/content-collections/"
+    - "Render on the server (build) and serve it. Do NOT install an adapter. Stay simple."
+    - "Hero image at the top from src/assets/desktop (desktop) and src/assets/mobile (mobile)"
+    - "Title in --font-body, subtitle (topic name) in --font-extended (see open_questions about the title font)"
+    - "Bullet items with two lines: the big line in --font-size-xl or 2xl (decide by contrast using an available skill), text in --font-size-md"
+    - "Mid-page subtitles in --font-size-3xl or 2xl, exactly ONE step above the bullet-title size"
+    - "Icons from src/assets/icons"
+
+observations:
+  direct:
+    - "Every page: orange header with logo, then a black block (video placeholder), then a rounded hero image, then big orange 'LO NUEVO SÍ CUMPLE', then the topic name in a wide extended face, then content, then the existing orange footer."
+    - "Hero image has the asymmetric radius (large top-left and bottom-right, square others), same language as .carousel__frame and .intro__card."
+    - "Content blocks seen: orange-dot bullet lists with bold lead-ins; two-line bullets (bold line + smaller gray detail); orange mid-subtitles; stat rows with an orange icon on the left; one bordered callout card with a circular icon (Ayudamos)."
+    - "Body text is gray, bullets are orange dots, emphasis is bold."
+  inferred:
+    - "Mobile layout is the mockup layout. Desktop layout: same single column, content width limited by the container."
+    - "Slug = file name. Routes: /seguridad, /movilidad, /agua, /salud, /ayudamos, /capullos, /espacios-publicos, /economia, /medio-ambiente."
+    - "Icon mapping: medal-icon = Primer Lugar, police-icon = +7700 policías, pointer-icon = 7 nuevas Divisiones, hands-icon = pobreza callout."
+  uncertain:
+    - "pointer-icon.svg meaning for 'Divisiones' (verify by opening the SVG)."
+    - "Mockup shows the hero at ~16:9 on mobile, but the real mobile art is 1080x1440 (3:4)."
+
+repository_context:
+  relevant_files:
+    - "astro.config.mjs (modify: add mdx integration)"
+    - "src/content.config.ts (create)"
+    - "src/content/reports/ (empty dir exists)"
+    - "src/pages/index.astro (reference only, do not modify)"
+    - "src/layouts/Layout.astro (reuse: gives Header + Footer)"
+    - "src/components/HeroCarousel.astro (reference: <picture> + <source media='(max-width: 47.999rem)'> pattern)"
+    - "src/config/site.ts (siteConfig.video: status 'coming-soon', url null)"
+    - "src/styles/global.css (add block before 'Utilidades globales')"
+    - "src/assets/desktop/carousel-1-{1..9}-desktop.webp (1920x1080)"
+    - "src/assets/mobile/carousel-1-{1..9}-mobile.webp (1080x1440)"
+    - "src/assets/icons/{medal,police,pointer,hands}-icon.svg (150x150, orange baked in)"
+  reusable_components: [".container", "Layout.astro", "Header", "Footer"]
+  reusable_tokens:
+    - "--color-orange, --color-orange-dark, --color-gray-dark, --color-text, --color-bg, --color-border"
+    - "--font-display, --font-body, --font-extended"
+    - "--font-size-md, --font-size-xl, --font-size-2xl, --font-size-3xl"
+    - "--space-*, --radius-sm, --radius-pill, --line-tight, --line-normal"
+  constraints:
+    - "Astro ^7.3.5, static output. @astrojs/mdx is NOT installed yet and is required (it is an integration, not an adapter): run `pnpm astro add mdx`."
+    - "Class prefix .report / .report-*. Do NOT use .carousel, .projects, .arrow-btn, .site-footer."
+    - "Tabs for indentation, single quotes in new components, Spanish copy and aria text."
+    - "No JS needed on these pages."
+    - "Mobile breakpoint convention: max-width 47.999rem / min-width 48rem."
+    - "Ignore src/assets/{desktop,mobile}/toignore*.webp."
+
+page_image_map:
+  economia: 1
+  espacios-publicos: 2
+  agua: 3
+  salud: 4
+  medio-ambiente: 5
+  seguridad: 6
+  ayudamos: 7
+  movilidad: 8
+  capullos: 9
+
+architecture:
+  config:
+    - "astro.config.mjs: import mdx from '@astrojs/mdx'; integrations: [mdx()]. Leave output static. No adapter."
+  collection:
+    file: "src/content.config.ts"
+    definition: |
+      import { defineCollection } from 'astro:content';
+      import { glob } from 'astro/loaders';
+      import { z } from 'astro/zod';
+      const reports = defineCollection({
+        loader: glob({ base: './src/content/reports', pattern: '**/*.mdx' }),
+        schema: ({ image }) => z.object({
+          title: z.string(),
+          order: z.number(),
+          imageDesktop: image(),
+          imageMobile: image(),
+          imageAlt: z.string(),
+          description: z.string(),
+        }),
+      });
+      export const collections = { reports };
+    notes:
+      - "Verify the `schema: ({ image }) =>` form against the astro:content reference for 7.x. If it differs, follow the docs."
+      - "Entry id comes from the file name (lowercase, URL-safe)."
+      - "Image paths in frontmatter are relative to the MDX file: ../../assets/desktop/carousel-1-6-desktop.webp"
+  route:
+    file: "src/pages/[id].astro"
+    behavior: "getStaticPaths() maps getCollection('reports') to { params: { id: entry.id }, props: { entry } }. Then `const { Content } = await render(entry)` and <Content components={{ Stat, Callout, Detail }} />. Wrapped in Layout with title/description from frontmatter. Prerendered, so no adapter."
+  components:
+    - "ReportHero.astro: props { desktop, mobile, alt }. <picture><source media='(max-width: 47.999rem)' srcset={mobile.src}><img src={desktop.src} width height alt></picture>, eager loading (it is the main image). Reuse the asymmetric radius clamp(2rem, 5vw, 3rem) 0. Frame aspect-ratio 16/9 desktop, 3/4 mobile (matches the real art)."
+    - "ReportVideo.astro: full-bleed black 16:9 box driven by siteConfig.video. If status is 'ready' and url exists, render the player/embed (keep it minimal); otherwise render the black placeholder with a visually-hidden label."
+    - "Stat.astro: props { icon: 'medal' | 'police' | 'pointer' }. Slot = text. Icon imported from src/assets/icons as <img alt=''> (decorative), text beside it."
+    - "Callout.astro: props { icon: 'hands' }. Bordered rounded card in --color-orange-dark with a circular icon overlapping the top-right corner. Slot = content."
+    - "Detail.astro: block-level second line for two-line bullets. Slot = text."
+  page_markup: |
+    <Layout title description>
+      <main id="contenido">
+        <h1 class="visually-hidden">…</h1>  # topic name, e.g. 'Seguridad'
+        <ReportVideo />
+        <div class="container">
+          <ReportHero … />
+          <header class="report__header">
+            <p class="report__title">Lo nuevo sí cumple</p>   # visual title (see open_questions)
+            <h1 class="report__topic">{entry.data.title}</h1> # the real h1
+          </header>
+          <div class="report-prose"><Content components=… /></div>
+        </div>
+      </main>
+    </Layout>
+  semantic_notes:
+    - "Only one <h1> per page: the topic name. Do not keep the visually-hidden h1 from index.astro here."
+    - "Mid-subtitles in the MDX are ## (h2)."
+
+typography:
+  rules:
+    - "Visual title 'Lo nuevo sí cumple': --font-display, --font-size-3xl, uppercase, orange (see open_questions about --font-body)."
+    - "Topic name: --font-extended, --font-size-2xl, uppercase, orange."
+    - "Two-line bullet title (bold first line): --font-body, bold, --font-size-xl OR --font-size-2xl, colour per contrast decision."
+    - "Mid-subtitle (## h2): --font-body, bold, exactly ONE token above the bullet title: xl bullets -> 2xl; 2xl bullets -> 3xl."
+    - "Body and detail text: --font-body, --font-size-md, --color-gray-dark. Footnotes (INEGI…): --font-size-xs."
+  contrast_decision:
+    skill: "Load the `web-design-guidelines` skill and run its accessibility/contrast audit on the report page. Also compute WCAG ratios directly."
+    facts:
+      - "--color-orange #eb9012 on white = about 2.5:1. Fails even the 3:1 large-text minimum."
+      - "--color-orange-dark #c9760a on white = about 3.45:1. Passes 3:1 for large text (>=24px, or >=18.66px bold). Fails 4.5:1 for normal text."
+      - "--color-gray-dark and --color-text on white pass comfortably."
+    guidance:
+      - "Orange text is only allowed at large sizes (xl and up) and preferably with --color-orange-dark."
+      - "Body text (md) must never be orange. Orange-dot bullet markers are decorative and may use --color-orange."
+      - "Decide xl vs 2xl for bullet titles from the audit result and the mockup density, then apply the one-step rule for mid-subtitles. Record the final pair in the completion report."
+      - "Expose sizes as CSS variables on .report-prose (--report-bullet-title, --report-subtitle) so they are one-line tweaks."
+
+mdx_conventions:
+  - "Bullets: standard Markdown lists. Bold lead-in with **text**."
+  - "Two-line bullet: `- **Title** <Detail>second line</Detail>`"
+  - "Mid-subtitle: `## Text` (inline bold allowed)."
+  - "Stat row: `<Stat icon='medal'>**Primer Lugar** en Confianza (INEGI, 2026)</Stat>`"
+  - "Callout card: `<Callout icon='hands'>…</Callout>`"
+  - "Footnote: `<small>(INEGI, 2025).</small>`"
+  - "MDX files do not import components. They are passed through <Content components={...} />."
+
+css:
+  block: "'Informe por tema' placed after 'Pie de página' and before 'Utilidades globales' in src/styles/global.css"
+  must_cover:
+    - ".report__header (centered), .report__title, .report__topic"
+    - ".report-prose: lists with orange dot markers (li::marker colour --color-orange), spacing --space-sm between items, h2 styling, strong styling, small/footnote"
+    - ".report-detail (display block, md size, gray)"
+    - ".report-stat (flex, icon 3rem-ish, gap --space-sm), stats arranged in a wrapping row/grid of 2 columns from 48rem, 1 column on mobile"
+    - ".report-callout (border 3px solid orange-dark, radius, padding, circular icon badge overlapping the corner)"
+    - ".report-hero frame and .report-video 16:9 black box"
+  avoid:
+    - "New hardcoded colours or font names"
+    - "Editing HeroCarousel, ProjectsCarousel, Footer or Header styles"
+
+implementation_plan:
+  create:
+    - "src/content.config.ts"
+    - "src/content/reports/*.mdx (9 files, data comes from .agents/plan-reports-content.yaml)"
+    - "src/pages/[id].astro"
+    - "src/components/ReportHero.astro, ReportVideo.astro, Stat.astro, Callout.astro, Detail.astro"
+  modify:
+    - "astro.config.mjs"
+    - "package.json (via pnpm astro add mdx)"
+    - "src/styles/global.css"
+  avoid:
+    - "Installing any adapter or changing output to server"
+    - "Live collections or on-demand rendering (MDX cannot render at runtime)"
+    - "Linking ProjectsCarousel cards to these pages (deferred by the user)"
+    - "Touching index.astro or the home page components"
+  ordered_steps:
+    - "1. pnpm astro add mdx. Confirm no adapter was added."
+    - "2. Create src/content.config.ts."
+    - "3. Create the Seguridad MDX only (pilot: bullets, mid-subtitle, 4 stats, second list)."
+    - "4. Create the components, the [id].astro route and the CSS block."
+    - "5. pnpm build. Check /seguridad in dist."
+    - "6. Run the contrast audit with the web-design-guidelines skill. Fix sizes/colours per typography.contrast_decision."
+    - "7. Fill the other 8 pages from .agents/plan-reports-content.yaml (second artifact)."
+    - "8. Final pnpm build and acceptance check."
+
+acceptance_criteria:
+  - id: "AC1"
+    requirement: "@astrojs/mdx installed, no adapter, output still static. pnpm build passes."
+  - id: "AC2"
+    requirement: "src/content.config.ts defines a `reports` build-time collection with the schema above. A missing field or image in any MDX fails the build."
+  - id: "AC3"
+    requirement: "Nine static pages exist in dist: /seguridad, /movilidad, /agua, /salud, /ayudamos, /capullos, /espacios-publicos, /economia, /medio-ambiente."
+  - id: "AC4"
+    requirement: "Each page shows the video placeholder (16:9) then the hero image. The hero uses the mobile image below 48rem and the desktop image from 48rem."
+  - id: "AC5"
+    requirement: "Title/subtitle/bullet/mid-subtitle/body use the specified font tokens. Mid-subtitles are exactly one size token above bullet titles."
+  - id: "AC6"
+    requirement: "The xl-vs-2xl choice and text colours are backed by the web-design-guidelines contrast audit. No orange text at body size."
+  - id: "AC7"
+    requirement: "Icons come from src/assets/icons and are used per the mapping. They are decorative (alt='')."
+  - id: "AC8"
+    requirement: "Content is editable only in the MDX files. No page content is hardcoded in components."
+  - id: "AC9"
+    requirement: "Header and Footer render on every page via Layout. Exactly one h1 per page."
+  - id: "AC10"
+    requirement: "No horizontal overflow at 320px. Home page, HeroCarousel, ProjectsCarousel and Footer are unchanged."
+
+open_questions:
+  - "Title font: the request says the title uses --font-body, but the mockups show the condensed display face (as in ProjectsCarousel). Default: --font-display. Change to --font-body only if the user confirms."
+  - "Bullet titles at xl/2xl are much larger than the mockups. Sizes are tokens, so easy to tune after the audit."
+  - "pointer-icon.svg: confirm visually that it is the crosshair used for 'Divisiones'."
+  - "Mobile hero aspect: real art is 3:4. HeroCarousel mobile frame is still 9/16 (out of scope here, will crop its mobile art)."
+  - "Video: renders only a black placeholder until siteConfig.video.url is set."
