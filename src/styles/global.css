@@ -345,6 +345,10 @@ ol {
 	scroll-snap-align: start;
 }
 
+.carousel__slide picture {
+    display: initial;
+}
+
 .carousel__slide img {
 	width: 100%;
 	height: 100%;
