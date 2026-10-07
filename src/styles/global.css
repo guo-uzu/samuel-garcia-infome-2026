@@ -592,7 +592,7 @@ html:has(.site-menu__dialog[open]) {
 
 @media (max-width: 47.999rem) {
 	.carousel__frame {
-		aspect-ratio: 9 / 16;
+		aspect-ratio: 12 / 16;
 	}
 }
 
