@@ -29,14 +29,14 @@ export const siteConfig = {
     { href: "/proyectos/salud", label: "Salud" },
     { href: "/proyectos/ayudamos", label: "Ayudamos" },
     { href: "/proyectos/capullos", label: "Capullos" },
-    { href: "/proyectos/espacios-publicos", label: "Espacios públicos" },
+    { href: "/proyectos/espacios-publicos", label: "Espacios públicos" },   
     { href: "/proyectos/economia", label: "Economía" },
     { href: "/proyectos/medio-ambiente", label: "Medio ambiente" },
   ] satisfies readonly NavLink[],
   video: {
     status: "coming-soon",
     url: "Xi3rm7e82_o",
-    poster: null,
+    poster: null, 
   } satisfies ResourceLink & { poster: string | null },
   videosIndividualPage: {
     movilidad: {
@@ -47,7 +47,7 @@ export const siteConfig = {
     } satisfies ResourceLink & {
       poster: string | null;
       urlMobile: string | null;
-    },
+    },  
   },
   download: {
     status: "coming-soon",

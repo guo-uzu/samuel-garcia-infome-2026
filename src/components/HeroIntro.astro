@@ -1,17 +1,25 @@
 ---
 import samuelGarcia from "../assets/samuelGarcia.webp";
-import { YouTube } from "@astro-community/astro-embed-youtube";
 import { siteConfig } from "../config/site";
+
+const heroVideoUrl = siteConfig.video.url
+    ? `https://www.youtube-nocookie.com/embed/${siteConfig.video.url}?autoplay=1&mute=1&playsinline=1&rel=0`
+    : null;
 ---
 
 <section class="hero" aria-labelledby="hero-etiqueta">
-    <YouTube
-        class="hero__youtube"
-        poster={siteConfig.video.poster ?? ""}
-        posterQuality="high"
-        id={siteConfig.video.url}
-        params="controls=1&rel=0&playsinline=1"
-    />
+    {
+        heroVideoUrl && (
+            <iframe
+                class="hero__youtube hero__youtube--iframe"
+                src={heroVideoUrl}
+                title="Mensaje de Samuel García"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowfullscreen
+                referrerpolicy="strict-origin-when-cross-origin"
+            ></iframe>
+        )
+    }
 </section>
 
 <section class="intro" aria-label="Mensaje institucional">
@@ -36,6 +44,7 @@ import { siteConfig } from "../config/site";
                         que lo nuevo sí cumple!
                     </strong>
                 </p>
+
                 <p>
                     Millones de neoleoneses ya se benefician de las{" "}
                     <strong>obras que construimos por todo el estado,</strong>{" "}
@@ -43,6 +52,7 @@ import { siteConfig } from "../config/site";
                     escuelas, nuevos parques y estamos muy cerca de movernos en
                     las nuevas Líneas del Metro.
                 </p>
+
                 <p>
                     <strong>
                         Terminamos lo que otros gobiernos ni siquiera empezaron
@@ -53,6 +63,7 @@ import { siteConfig } from "../config/site";
                     la pobreza y seguimos siendo los primeros en economía y
                     coberturas de salud gratuitas.
                 </p>
+
                 <p>
                     Hace cinco años nos diste tu confianza y no te equivocaste,{" "}
                     <strong>
@@ -64,54 +75,3 @@ import { siteConfig } from "../config/site";
         </div>
     </div>
 </section>
-
-<script>
-    interface YouTubePlayer {
-        mute(): void;
-        playVideo(): void;
-    }
-
-    interface LiteYouTubeElement extends HTMLElement {
-        getYTPlayer(): Promise<YouTubePlayer>;
-    }
-
-    async function autoplayHeroVideo() {
-        // Wait until <lite-youtube> has been registered
-        await customElements.whenDefined("lite-youtube");
-
-        const youtube =
-            document.querySelector<LiteYouTubeElement>(".hero__youtube");
-
-        if (!youtube) return;
-
-        // Prevent initializing it twice
-        if (youtube.dataset.autoplayInitialized === "true") return;
-
-        youtube.dataset.autoplayInitialized = "true";
-
-        try {
-            // getYTPlayer() also activates/loads the real YouTube iframe
-            const player = await youtube.getYTPlayer();
-
-            // Autoplay is normally blocked unless the video is muted
-            player.playVideo();
-        } catch (error) {
-            console.error("Could not autoplay hero video:", error);
-
-            // Allow retry if Astro navigates/re-renders
-            youtube.dataset.autoplayInitialized = "false";
-        }
-    }
-
-    // Normal page load
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", autoplayHeroVideo, {
-            once: true,
-        });
-    } else {
-        autoplayHeroVideo();
-    }
-
-    // Also works if you're using Astro View Transitions / ClientRouter
-    document.addEventListener("astro:page-load", autoplayHeroVideo);
-</script>

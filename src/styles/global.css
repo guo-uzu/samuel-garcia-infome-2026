@@ -406,6 +406,12 @@ html:has(.site-menu__dialog[open]) {
     max-width: 100% !important;
     max-height: 800px;
 }
+
+.hero__youtube--iframe {
+	display: block;
+	aspect-ratio: 16 / 9;
+	border: 0;
+}
 .hero__youtube__mobile {
     aspect-ratio: 9/16;
     max-height: 850px;
@@ -894,6 +900,11 @@ html:has(.site-menu__dialog[open]) {
     display: none;
 }
 
+.report-video--mobile {
+	aspect-ratio: auto;
+	background-color: transparent;
+}
+
 @media (max-width: 47.999rem) {
 	.report-hero {
 		aspect-ratio: 3 / 4;
@@ -902,7 +913,7 @@ html:has(.site-menu__dialog[open]) {
         display: none;
 	}
 	.hero__individual__mobile {
-	    display: initial;
+	    display: block;
 	}
 }
 

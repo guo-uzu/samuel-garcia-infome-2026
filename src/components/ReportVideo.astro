@@ -1,6 +1,5 @@
 ---
 import { siteConfig } from "../config/site";
-import { YouTube } from "@astro-community/astro-embed-youtube";
 
 const { videosIndividualPage } = siteConfig;
 
@@ -21,86 +20,62 @@ const video =
         : null;
 
 const shouldShowVideo = video?.status === "ready";
+
+function getYouTubeId(value: string | null | undefined) {
+    if (!value) return null;
+    if (/^[A-Za-z0-9_-]{11}$/.test(value)) return value;
+
+    return (
+        value.match(
+            /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/,
+        )?.[1] ?? null
+    );
+}
+
+const videoId = getYouTubeId(video?.url);
+const autoplayUrl = videoId
+    ? `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1&rel=0`
+    : null;
 ---
 
 {shouldShowVideo && (
-    <section class="hero__individual">
-        {video.url && (
-            <YouTube
-                class="hero__youtube"
-                id={video.url}
-                posterQuality="high"
+    <section class="report-video hero__individual">
+        {autoplayUrl && (
+            <iframe
+                data-report-autoplay-src={autoplayUrl}
+                title="Video del informe"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowfullscreen
+                referrerpolicy="strict-origin-when-cross-origin"
             />
         )}
     </section>
 )}
 
 <script>
-    interface YouTubePlayer {
-        mute(): void;
-        playVideo(): void;
-        pauseVideo(): void;
-        stopVideo(): void;
-    }
+    const iframe = document.querySelector<HTMLIFrameElement>(
+        "[data-report-autoplay-src]",
+    );
 
-    interface LiteYouTubeElement extends HTMLElement {
-        getYTPlayer(): Promise<YouTubePlayer>;
-    }
+    if (iframe) {
+        const desktopMedia = window.matchMedia("(min-width: 48rem)");
 
-    const desktopMedia = window.matchMedia("(min-width: 769px)");
+        const updateAutoplay = () => {
+            const videoUrl = iframe.dataset.reportAutoplaySrc;
+            const hasVideoLoaded = iframe.dataset.loaded === "true";
 
-    let player: YouTubePlayer | null = null;
-
-    async function handleHeroVideo() {
-        const youtube =
-            document.querySelector<LiteYouTubeElement>(".hero__youtube");
-
-        if (!youtube) return;
-
-        // MOBILE: don't initialize YouTube just to stop it.
-        // If it was already initialized on desktop, stop + mute it.
-        if (!desktopMedia.matches) {
-            if (player) {
-                player.mute();
-                player.stopVideo();
+            if (desktopMedia.matches && videoUrl && !hasVideoLoaded) {
+                iframe.src = videoUrl;
+                iframe.dataset.loaded = "true";
             }
 
-            return;
-        }
-
-        // DESKTOP ONLY
-        await customElements.whenDefined("lite-youtube");
-
-        try {
-            // Initialize only once
-            if (!player) {
-                player = await youtube.getYTPlayer();
+            if (!desktopMedia.matches && hasVideoLoaded) {
+                iframe.src = "about:blank";
+                delete iframe.dataset.loaded;
             }
+        };
 
-            // Muting is required for reliable browser autoplay
-            player.mute();
-            player.playVideo();
-        } catch (error) {
-            console.error("Could not autoplay hero video:", error);
-        }
+        desktopMedia.addEventListener("change", updateAutoplay);
+        updateAutoplay();
     }
-
-    // Initial page load
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", handleHeroVideo, {
-            once: true,
-        });
-    } else {
-        handleHeroVideo();
-    }
-
-    // Astro View Transitions / ClientRouter
-    document.addEventListener("astro:page-load", () => {
-        // New page may contain a different <lite-youtube>
-        player = null;
-        handleHeroVideo();
-    });
-
-    // React when crossing the 768px breakpoint
-    desktopMedia.addEventListener("change", handleHeroVideo);
 </script>
