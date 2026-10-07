@@ -35,7 +35,7 @@ export const siteConfig = {
 	] satisfies readonly NavLink[],
 	video: {
 		status: 'coming-soon',
-		url: null,
+		url: "Xi3rm7e82_o",
 		poster: null,
 	} satisfies ResourceLink & { poster: string | null },
 	download: {

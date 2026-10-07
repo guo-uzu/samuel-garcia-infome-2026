@@ -1,13 +1,11 @@
 ---
 import samuelGarcia from "../assets/samuelGarcia.webp";
+import { YouTube } from "@astro-community/astro-embed-youtube";
+import { siteConfig } from "../config/site";
 ---
 
-<section class="visually-hidden hero" aria-labelledby="hero-etiqueta">
-    <div class="hero__poster">
-        <p class="hero__etiqueta" id="hero-etiqueta">
-            Contenido audiovisual próximamente
-        </p>
-    </div>
+<section class="hero" aria-labelledby="hero-etiqueta">
+    <YouTube class="hero__youtube" id={siteConfig.video.url} />
 </section>
 
 <section class="intro" aria-label="Mensaje institucional">

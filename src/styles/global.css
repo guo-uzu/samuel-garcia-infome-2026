@@ -397,12 +397,14 @@ html:has(.site-menu__dialog[open]) {
 	display: grid;
 	place-items: center;
 	width: 100%;
-	aspect-ratio: 4 / 5;
 	padding: var(--space-lg);
-	background-color: var(--color-gray-dark);
-	background-image: linear-gradient(140deg, var(--color-gray-dark), #262524);
-	color: var(--color-text-inverse);
 	text-align: center;
+}
+
+.hero__youtube {
+    width: 100%;
+    max-width: 100% !important;
+    max-height: 800px;
 }
 
 .hero__etiqueta {
