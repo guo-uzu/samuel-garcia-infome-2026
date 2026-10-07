@@ -275,17 +275,6 @@ const sets = [0, 1, 2];
             startTimer();
         });
 
-        track.addEventListener("click", (event) => {
-            const card = (event.target as Element).closest(".projects-card");
-            if (!card) return;
-
-            const index = Number((card as HTMLElement).dataset.index);
-            if (Number.isNaN(index)) return;
-
-            moveToBase(index);
-            startTimer();
-        });
-
         viewport.addEventListener("keydown", (event) => {
             if (event.key === "ArrowLeft") {
                 event.preventDefault();

@@ -1,52 +1,62 @@
 ---
-import samuelGarcia from '../assets/samuelGarcia.webp';
+import samuelGarcia from "../assets/samuelGarcia.webp";
 ---
 
-<section class="hero" aria-labelledby="hero-etiqueta">
-	<div class="hero__poster">
-		<p class="hero__etiqueta" id="hero-etiqueta">
-			Contenido audiovisual próximamente
-		</p>
-	</div>
+<section class="visually-hidden hero" aria-labelledby="hero-etiqueta">
+    <div class="hero__poster">
+        <p class="hero__etiqueta" id="hero-etiqueta">
+            Contenido audiovisual próximamente
+        </p>
+    </div>
 </section>
 
 <section class="intro" aria-label="Mensaje institucional">
-	<div class="container">
-		<div class="intro__card">
-			<div class="intro__portrait">
-				<img
-					src={samuelGarcia.src}
-					alt="Samuel García"
-					width={samuelGarcia.width}
-					height={samuelGarcia.height}
-					loading="lazy"
-					decoding="async"
-				/>
-			</div>
+    <div class="container">
+        <div class="intro__card">
+            <div class="intro__portrait">
+                <img
+                    src={samuelGarcia.src}
+                    alt="Samuel García"
+                    width={samuelGarcia.width}
+                    height={samuelGarcia.height}
+                    loading="lazy"
+                    decoding="async"
+                />
+            </div>
 
-			<div class="intro__copy">
-				<p>
-					Hace un año <strong>te dije que íbamos en tiempo y forma, hoy te
-					demuestro que lo nuevo sí cumple!</strong>
-				</p>
-				<p>
-					Millones de neoleoneses ya se benefician de las{' '}
-					<strong>obras que construimos por todo el estado,</strong> como el
-					Nuevo Cuartel General, la Nueva Presa León, nuevas escuelas, nuevos
-					parques y estamos muy cerca de movernos en las nuevas Líneas del Metro.
-				</p>
-				<p>
-					<strong>Terminamos lo que otros gobiernos ni siquiera empezaron y sin
-					endeudar al estado.</strong> Gracias a ello, Nuevo León tiene los mejores
-					resultados de seguridad de los últimos 20 años, una reducción histórica
-					de la pobreza y seguimos siendo los primeros en economía y coberturas de
-					salud gratuitas.
-				</p>
-				<p>
-					Hace cinco años nos diste tu confianza y no te equivocaste,{' '}
-					<strong>valió la pena confiar en lo nuevo, porque lo nuevo sí cumple.</strong>
-				</p>
-			</div>
-		</div>
-	</div>
+            <div class="intro__copy">
+                <p>
+                    Hace un año{" "}
+                    <strong>
+                        te dije que íbamos en tiempo y forma, hoy te demuestro
+                        que lo nuevo sí cumple!
+                    </strong>
+                </p>
+                <p>
+                    Millones de neoleoneses ya se benefician de las{" "}
+                    <strong>obras que construimos por todo el estado,</strong>{" "}
+                    como el Nuevo Cuartel General, la Nueva Presa León, nuevas
+                    escuelas, nuevos parques y estamos muy cerca de movernos en
+                    las nuevas Líneas del Metro.
+                </p>
+                <p>
+                    <strong>
+                        Terminamos lo que otros gobiernos ni siquiera empezaron
+                        y sin endeudar al estado.
+                    </strong>{" "}
+                    Gracias a ello, Nuevo León tiene los mejores resultados de
+                    seguridad de los últimos 20 años, una reducción histórica de
+                    la pobreza y seguimos siendo los primeros en economía y
+                    coberturas de salud gratuitas.
+                </p>
+                <p>
+                    Hace cinco años nos diste tu confianza y no te equivocaste,{" "}
+                    <strong>
+                        valió la pena confiar en lo nuevo, porque lo nuevo sí
+                        cumple.
+                    </strong>
+                </p>
+            </div>
+        </div>
+    </div>
 </section>
