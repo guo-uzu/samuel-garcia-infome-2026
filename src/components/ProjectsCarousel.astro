@@ -12,6 +12,7 @@ import salud from "../assets/secondCarousel/carousel-2-9.webp";
 
 interface Project {
     label: string;
+    href: string;
     src: string;
     alt: string;
     width: number;
@@ -21,6 +22,7 @@ interface Project {
 const projects: Project[] = [
     {
         label: "Economía",
+        href: "/proyectos/economia",
         src: economia.src,
         alt: "Economía: trabajador con casco de seguridad en una planta industrial de Nuevo León.",
         width: economia.width,
@@ -28,6 +30,7 @@ const projects: Project[] = [
     },
     {
         label: "Medio ambiente",
+        href: "/proyectos/medio-ambiente",
         src: medioAmbiente.src,
         alt: "Medio ambiente: mural con huellas de mascotas y flores en Nuevo León.",
         width: medioAmbiente.width,
@@ -35,6 +38,7 @@ const projects: Project[] = [
     },
     {
         label: "Seguridad",
+        href: "/proyectos/seguridad",
         src: seguridad.src,
         alt: "Seguridad: helicóptero de la Guardia Estatal sobre un edificio de Nuevo León.",
         width: seguridad.width,
@@ -42,6 +46,7 @@ const projects: Project[] = [
     },
     {
         label: "Movilidad",
+        href: "/proyectos/movilidad",
         src: movilidad.src,
         alt: "Movilidad: tren del Metro de Monterrey en movimiento.",
         width: movilidad.width,
@@ -49,34 +54,39 @@ const projects: Project[] = [
     },
     {
         label: "Agua",
+        href: "/proyectos/agua",
         src: agua.src,
         alt: "Agua: presa y embarcación en Nuevo León.",
         width: agua.width,
         height: agua.height,
     },
     {
-        label: "Mujeres",
+        label: "Ayudamos",
+        href: "/proyectos/ayudamos",
         src: mujeres.src,
-        alt: "Mujeres: Samuel García con mujeres en un evento comunitario.",
+        alt: "Ayudamos: Samuel García con mujeres en un evento comunitario.",
         width: mujeres.width,
         height: mujeres.height,
     },
     {
-        label: "Educación",
+        label: "Capullos",
+        href: "/proyectos/capullos",
         src: educacion.src,
-        alt: "Educación: campus escolar renovado con fachadas de colores.",
+        alt: "Capullos: campus escolar renovado con fachadas de colores.",
         width: educacion.width,
         height: educacion.height,
     },
     {
-        label: "Deporte",
+        label: "Espacios Públicos",
+        href: "/proyectos/espacios-publicos",
         src: deporte.src,
-        alt: "Deporte: Samuel García juega fútbol con un niño en un estadio.",
+        alt: "Espacios Públicos: Samuel García juega fútbol con un niño en un estadio.",
         width: deporte.width,
         height: deporte.height,
     },
     {
         label: "Salud",
+        href: "/proyectos/salud",
         src: salud.src,
         alt: "Salud: retrato de una niña sonriente en Nuevo León.",
         width: salud.width,
@@ -107,11 +117,10 @@ const sets = [0, 1, 2];
                         aria-roledescription="diapositiva"
                         aria-label={`${index + 1} de ${projects.length}`}
                         aria-hidden={set !== 1 ? "true" : undefined}
-                        inert={set !== 1 ? true : undefined}
                     >
-                        <button
+                        <a
                             class="projects-card"
-                            type="button"
+                            href={project.href}
                             data-index={index}
                             tabindex={set !== 1 ? -1 : undefined}
                         >
@@ -129,7 +138,7 @@ const sets = [0, 1, 2];
                             <span class="projects-card__label">
                                 {project.label}
                             </span>
-                        </button>
+                        </a>
                     </li>
                 )),
             )}

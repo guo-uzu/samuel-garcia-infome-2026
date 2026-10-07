@@ -1,165 +1,213 @@
 ---
-import blackHawks from '../assets/desktop/carousel-1-6-desktop.webp';
-import blackHawksMobile from '../assets/mobile/carousel-1-6-mobile.webp';
-import cruce from '../assets/desktop/carousel-1-1-desktop.webp';
-import cruceMobile from '../assets/mobile/carousel-1-1-mobile.webp';
-import estadio from '../assets/desktop/carousel-1-2-desktop.webp';
-import estadioMobile from '../assets/mobile/carousel-1-2-mobile.webp';
-import limpieza from '../assets/desktop/carousel-1-5-desktop.webp';
-import limpiezaMobile from '../assets/mobile/carousel-1-5-mobile.webp';
-import mujeres from '../assets/desktop/carousel-1-7-desktop.webp';
-import mujeresMobile from '../assets/mobile/carousel-1-7-mobile.webp';
-import capullos from '../assets/desktop/carousel-1-9-desktop.webp';
-import capullosMobile from '../assets/mobile/carousel-1-9-mobile.webp';
+import cruce from "../assets/desktop/carousel-1-1-desktop.webp";
+import cruceMobile from "../assets/mobile/carousel-1-1-mobile.webp";
+import espaciosPublicos from "../assets/desktop/carousel-1-2-desktop.webp";
+import espaciosPublicosMobile from "../assets/mobile/carousel-1-2-mobile.webp";
+import agua from "../assets/desktop/carousel-1-3-desktop.webp";
+import aguaMobile from "../assets/mobile/carousel-1-3-mobile.webp";
+import salud from "../assets/desktop/carousel-1-4-desktop.webp";
+import saludMobile from "../assets/mobile/carousel-1-4-mobile.webp";
+import limpieza from "../assets/desktop/carousel-1-5-desktop.webp";
+import limpiezaMobile from "../assets/mobile/carousel-1-5-mobile.webp";
+import blackHawks from "../assets/desktop/carousel-1-6-desktop.webp";
+import blackHawksMobile from "../assets/mobile/carousel-1-6-mobile.webp";
+import mujeres from "../assets/desktop/carousel-1-7-desktop.webp";
+import mujeresMobile from "../assets/mobile/carousel-1-7-mobile.webp";
+import movilidad from "../assets/desktop/carousel-1-8-desktop.webp";
+import movilidadMobile from "../assets/mobile/carousel-1-8-mobile.webp";
+import capullos from "../assets/desktop/carousel-1-9-desktop.webp";
+import capullosMobile from "../assets/mobile/carousel-1-9-mobile.webp";
 
 interface Slide {
-	src: string;
-	srcMobile: string;
-	alt: string;
-	width: number;
-	height: number;
-	eager?: boolean;
+    src: string;
+    srcMobile: string;
+    href: string;
+    alt: string;
+    width: number;
+    height: number;
+    eager?: boolean;
 }
 
 const slides: Slide[] = [
-	{
-		src: blackHawks.src,
-		srcMobile: blackHawksMobile.src,
-		alt: 'Nuevos Black Hawks: Samuel García camina frente a un helicóptero de la Guardia Estatal. Lo nuevo sí cumple.',
-		width: blackHawks.width,
-		height: blackHawks.height,
-		eager: true,
-	},
-	{
-		src: cruce.src,
-		srcMobile: cruceMobile.src,
-		alt: 'Lo nuevo sí cumple: vista aérea del nuevo cruce vial en Nuevo León.',
-		width: cruce.width,
-		height: cruce.height,
-	},
-	{
-		src: estadio.src,
-		srcMobile: estadioMobile.src,
-		alt: 'Nuevo Estadio Bicentenario: Samuel García juega fútbol con niños frente al estadio. Lo nuevo sí cumple.',
-		width: estadio.width,
-		height: estadio.height,
-	},
-	{
-		src: limpieza.src,
-		srcMobile: limpiezaMobile.src,
-		alt: 'Samuel García participa en una jornada de limpieza con voluntarios junto a un río de Nuevo León.',
-		width: limpieza.width,
-		height: limpieza.height,
-	},
-	{
-		src: mujeres.src,
-		srcMobile: mujeresMobile.src,
-		alt: 'Ayudamos a las mujeres: Samuel García entre asistentes de un evento comunitario. Lo nuevo sí cumple.',
-		width: mujeres.width,
-		height: mujeres.height,
-	},
-	{
-		src: capullos.src,
-		srcMobile: capullosMobile.src,
-		alt: 'Nuevo Capullos: Samuel García convive con niñas y niños en una cancha deportiva. Lo nuevo sí cumple.',
-		width: capullos.width,
-		height: capullos.height,
-	},
+    {
+        src: blackHawks.src,
+        srcMobile: blackHawksMobile.src,
+        href: "/proyectos/seguridad",
+        alt: "Nuevos Black Hawks: Samuel García camina frente a un helicóptero de la Guardia Estatal. Lo nuevo sí cumple.",
+        width: blackHawks.width,
+        height: blackHawks.height,
+        eager: true,
+    },
+    {
+        src: cruce.src,
+        srcMobile: cruceMobile.src,
+        href: "/proyectos/economia",
+        alt: "Lo nuevo sí cumple: vista aérea del nuevo cruce vial en Nuevo León.",
+        width: cruce.width,
+        height: cruce.height,
+    },
+    {
+        src: movilidad.src,
+        srcMobile: movilidadMobile.src,
+        href: "/proyectos/movilidad",
+        alt: "Nuevos camiones: Samuel García convive con pasajeros dentro de un camión de transporte de Nuevo León. Lo nuevo sí cumple.",
+        width: movilidad.width,
+        height: movilidad.height,
+    },
+    {
+        src: limpieza.src,
+        srcMobile: limpiezaMobile.src,
+        href: "/proyectos/medio-ambiente",
+        alt: "Samuel García participa en una jornada de limpieza con voluntarios junto a un río de Nuevo León.",
+        width: limpieza.width,
+        height: limpieza.height,
+    },
+    {
+        src: mujeres.src,
+        srcMobile: mujeresMobile.src,
+        href: "/proyectos/ayudamos",
+        alt: "Ayudamos a las mujeres: Samuel García entre asistentes de un evento comunitario. Lo nuevo sí cumple.",
+        width: mujeres.width,
+        height: mujeres.height,
+    },
+    {
+        src: capullos.src,
+        srcMobile: capullosMobile.src,
+        href: "/proyectos/capullos",
+        alt: "Nuevo Capullos: Samuel García convive con niñas y niños en una cancha deportiva. Lo nuevo sí cumple.",
+        width: capullos.width,
+        height: capullos.height,
+    },
+    {
+        src: espaciosPublicos.src,
+        srcMobile: espaciosPublicosMobile.src,
+        href: "/proyectos/espacios-publicos",
+        alt: "Nuevo Estadio Bicentenario: Samuel García juega fútbol con un niño en espacios públicos de Nuevo León. Lo nuevo sí cumple.",
+        width: espaciosPublicos.width,
+        height: espaciosPublicos.height,
+    },
+    {
+        src: agua.src,
+        srcMobile: aguaMobile.src,
+        href: "/proyectos/agua",
+        alt: "Nueva Presa León: Samuel García navega en lancha por la presa con un hombre. Lo nuevo sí cumple.",
+        width: agua.width,
+        height: agua.height,
+    },
+    {
+        src: salud.src,
+        srcMobile: saludMobile.src,
+        href: "/proyectos/salud",
+        alt: "Ayudamos a cuidar tu salud: Samuel García saluda a un hombre en silla de ruedas durante la entrega de apoyos. Lo nuevo sí cumple.",
+        width: salud.width,
+        height: salud.height,
+    },
 ];
 ---
 
-<section class="carousel" aria-roledescription="carrusel" aria-label="Destacados del informe">
-	<div class="container">
-		<div class="carousel__frame">
-			<ul class="carousel__track" tabindex="0" aria-label="Diapositivas del carrusel">
-				{
-					slides.map((slide, index) => (
-						<li
-							class="carousel__slide"
-							role="group"
-							aria-roledescription="diapositiva"
-							aria-label={`${index + 1} de ${slides.length}`}
-						>
-							<picture>
-								<source media="(max-width: 47.999rem)" srcset={slide.srcMobile} />
-								<img
-									src={slide.src}
-									alt={slide.alt}
-									width={slide.width}
-									height={slide.height}
-									loading={slide.eager ? 'eager' : 'lazy'}
-									decoding="async"
-									draggable="false"
-								/>
-							</picture>
-						</li>
-					))
-				}
-			</ul>
+<section
+    class="carousel"
+    aria-roledescription="carrusel"
+    aria-label="Destacados del informe"
+>
+    <div class="container">
+        <div class="carousel__frame">
+            <ul
+                class="carousel__track"
+                tabindex="0"
+                aria-label="Diapositivas del carrusel"
+            >
+                {slides.map((slide, index) => (
+                    <li
+                        class="carousel__slide"
+                        role="group"
+                        aria-roledescription="diapositiva"
+                        aria-label={`${index + 1} de ${slides.length}`}
+                    >
+                        <a href={slide.href} draggable="false">
+                            <picture>
+                                <source
+                                    media="(max-width: 47.999rem)"
+                                    srcset={slide.srcMobile}
+                                />
+                                <img
+                                    src={slide.src}
+                                    alt={slide.alt}
+                                    width={slide.width}
+                                    height={slide.height}
+                                    loading={slide.eager ? "eager" : "lazy"}
+                                    decoding="async"
+                                    draggable="false"
+                                />
+                            </picture>
+                        </a>
+                    </li>
+                ))}
+            </ul>
 
-			<div class="carousel__pager">
-				{
-					slides.map((_, index) => (
-						<button
-							class="carousel__dot"
-							type="button"
-							aria-label={`Ir a la diapositiva ${index + 1}`}
-							aria-current={index === 0 ? 'true' : undefined}
-						/>
-					))
-				}
-			</div>
-		</div>
-	</div>
+            <div class="carousel__pager">
+                {slides.map((_, index) => (
+                    <button
+                        class="carousel__dot"
+                        type="button"
+                        aria-label={`Ir a la diapositiva ${index + 1}`}
+                        aria-current={index === 0 ? "true" : undefined}
+                    />
+                ))}
+            </div>
+        </div>
+    </div>
 </section>
 
 <script>
-	function initCarousel(carousel: Element) {
-		const track = carousel.querySelector('.carousel__track');
-		const dots = Array.from(carousel.querySelectorAll('.carousel__dot'));
+    function initCarousel(carousel: Element) {
+        const track = carousel.querySelector(".carousel__track");
+        const dots = Array.from(carousel.querySelectorAll(".carousel__dot"));
 
-		if (!track || dots.length === 0) return;
+        if (!track || dots.length === 0) return;
 
-		const slides = Array.from(track.querySelectorAll('.carousel__slide'));
-		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const slides = Array.from(track.querySelectorAll(".carousel__slide"));
+        const reducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+        );
 
-		const setActive = (index: number) => {
-			dots.forEach((dot, i) => {
-				if (i === index) {
-					dot.setAttribute('aria-current', 'true');
-				} else {
-					dot.removeAttribute('aria-current');
-				}
-			});
-		};
+        const setActive = (index: number) => {
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.setAttribute("aria-current", "true");
+                } else {
+                    dot.removeAttribute("aria-current");
+                }
+            });
+        };
 
-		dots.forEach((dot, index) => {
-			dot.addEventListener('click', () => {
-				const slide = slides[index];
-				if (!slide) return;
+        dots.forEach((dot, index) => {
+            dot.addEventListener("click", () => {
+                const slide = slides[index];
+                if (!slide) return;
 
-				slide.scrollIntoView({
-					behavior: reducedMotion.matches ? 'auto' : 'smooth',
-					inline: 'start',
-					block: 'nearest',
-				});
-			});
-		});
+                slide.scrollIntoView({
+                    behavior: reducedMotion.matches ? "auto" : "smooth",
+                    inline: "start",
+                    block: "nearest",
+                });
+            });
+        });
 
-		const observer = new IntersectionObserver(
-			(entries) => {
-				for (const entry of entries) {
-					if (!entry.isIntersecting) continue;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (!entry.isIntersecting) continue;
 
-					const index = slides.indexOf(entry.target);
-					if (index !== -1) setActive(index);
-				}
-			},
-			{ root: track, threshold: 0.6 },
-		);
+                    const index = slides.indexOf(entry.target);
+                    if (index !== -1) setActive(index);
+                }
+            },
+            { root: track, threshold: 0.6 },
+        );
 
-		slides.forEach((slide) => observer.observe(slide));
-	}
+        slides.forEach((slide) => observer.observe(slide));
+    }
 
-	document.querySelectorAll('.carousel').forEach(initCarousel);
+    document.querySelectorAll(".carousel").forEach(initCarousel);
 </script>

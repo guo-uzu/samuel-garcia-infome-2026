@@ -1,0 +1,111 @@
+artifact_version: "1.0"
+
+feature:
+  name: "Link both carousels to the report pages"
+  goal: "Clicking a slide (HeroCarousel) or a card (ProjectsCarousel) navigates to the matching /proyectos/{id} page in the same tab."
+  location: "src/components/HeroCarousel.astro, src/components/ProjectsCarousel.astro, src/styles/global.css"
+
+source_of_truth:
+  visual_reference: "No new visual. Existing carousels keep their look."
+  user_requirements:
+    - "Link both carousels with each page in src/content/reports."
+    - "Click goes to the page. Do NOT use target=_blank, redirect in the same tab."
+    - "HeroCarousel now has all 9 images, so both carousels cover the same 9 reports."
+    - "Keep it simple."
+
+observations:
+  direct:
+    - "HeroCarousel.astro has 9 slides (slides array) rendered as <picture>/<img> inside li.carousel__slide. No links yet."
+    - "ProjectsCarousel.astro has 9 cards rendered as <button class='projects-card'>, repeated in 3 sets (clones in sets 0 and 2 have aria-hidden, inert and tabindex=-1)."
+    - "A click handler on .projects__track currently centers the clicked card (moveToBase)."
+    - "Report routes are /proyectos/{id}; the same hrefs already exist in siteConfig.nav (src/config/site.ts)."
+    - "Layout has no view transitions or router. A normal <a href> does a full page load."
+  inferred:
+    - "Hrefs are written directly in each component's data array (simple, no new helper)."
+    - "Any click on a projects card should navigate (subtitle says 'Selecciona el proyecto para saber más')."
+    - "Hero and Projects keep their own slide order."
+  uncertain:
+    - "Whether a side card in the projects carousel should center first and only the center card navigate (default: no, navigate on any click)."
+    - "Whether Hero should be reordered to match siteConfig.nav (default: no, Black Hawks stays the lead slide)."
+
+repository_context:
+  relevant_files:
+    - "src/components/HeroCarousel.astro (modify)"
+    - "src/components/ProjectsCarousel.astro (modify)"
+    - "src/styles/global.css (modify: .carousel__slide a, .projects-card)"
+    - "src/config/site.ts (read only, source of the hrefs)"
+  reusable_tokens: ["existing carousel and project-card styles; no new tokens"]
+  constraints:
+    - "No new dependency, no target or rel attributes, same-tab navigation."
+    - "Do not change the autoplay, arrows, pager dots or scroll-snap behavior."
+    - "Keep each file's indentation (4 spaces in these .astro files, tabs in global.css)."
+
+mapping:
+  note: "Same 9 pages in both carousels. Use these hrefs exactly."
+  rows:
+    - { report: "Seguridad", hero_slide: "blackHawks (1-6)", projects_card: "Seguridad", href: "/proyectos/seguridad" }
+    - { report: "Economía", hero_slide: "cruce (1-1)", projects_card: "Economía", href: "/proyectos/economia" }
+    - { report: "Movilidad", hero_slide: "movilidad (1-8)", projects_card: "Movilidad", href: "/proyectos/movilidad" }
+    - { report: "Medio ambiente", hero_slide: "limpieza (1-5)", projects_card: "Medio ambiente", href: "/proyectos/medio-ambiente" }
+    - { report: "Ayudamos", hero_slide: "mujeres (1-7)", projects_card: "Ayudamos", href: "/proyectos/ayudamos" }
+    - { report: "Capullos", hero_slide: "capullos (1-9)", projects_card: "Capullos", href: "/proyectos/capullos" }
+    - { report: "Espacios públicos", hero_slide: "espaciosPublicos (1-2)", projects_card: "Espacios Públicos", href: "/proyectos/espacios-publicos" }
+    - { report: "Agua", hero_slide: "agua (1-3)", projects_card: "Agua", href: "/proyectos/agua" }
+    - { report: "Salud", hero_slide: "salud (1-4)", projects_card: "Salud", href: "/proyectos/salud" }
+
+hero_carousel_changes:
+  - "Add `href: string` to the Slide interface and set it on all 9 entries from the mapping."
+  - "Wrap each <picture> in `<a href={slide.href} draggable=\"false\">`. No aria-label: the img alt is the link's accessible name."
+  - "global.css: add `.carousel__slide a { display: block; height: 100%; }` so the image still fills the slide (keep the existing `.carousel__slide picture` rule)."
+  - "Do not touch the pager dots or the script. Dots come from slides.length (9)."
+
+projects_carousel_changes:
+  - "Add `href: string` to the Project interface and set it on all 9 entries from the mapping."
+  - "Replace <button class='projects-card' type='button'> with <a class='projects-card' href={project.href}>. Keep data-index and tabindex={set !== 1 ? -1 : undefined}."
+  - "Remove the `track.addEventListener('click', ...)` handler (moveToBase on click). Keep moveToBase only if still used elsewhere, otherwise delete it too. Arrows, keyboard and autoplay stay."
+  - "Remove `inert` from the cloned sets (set !== 1). Keep aria-hidden and tabindex=-1. Reason: inert blocks pointer events, so neighbor cards drawn from a clone set would not be clickable."
+  - "global.css: on .projects-card add `text-decoration: none; color: inherit;`. Keep the rest of the card styling (the button reset properties are harmless on an <a>)."
+
+accessibility:
+  requirements:
+    - "Links are keyboard focusable and keep the global :focus-visible ring."
+    - "Hero: img alt names each link. Projects: the visible label + img alt name each link."
+    - "Cloned cards stay aria-hidden with tabindex=-1 so there are no duplicate tab stops."
+    - "Same-tab navigation, no target attribute."
+
+implementation_plan:
+  modify:
+    - "src/components/HeroCarousel.astro"
+    - "src/components/ProjectsCarousel.astro"
+    - "src/styles/global.css"
+  avoid:
+    - "target=_blank or rel attributes"
+    - "New helper, config key or dependency"
+    - "Changing carousel order, autoplay, arrows, dots or scroll-snap logic"
+    - "Touching the MDX files, Layout, Header or SiteMenu"
+  ordered_steps:
+    - "1. HeroCarousel: add href to the interface and the 9 entries, wrap <picture> in <a>."
+    - "2. ProjectsCarousel: add href to the interface and the 9 entries, switch button to <a>, drop the click-to-center handler and inert on clones."
+    - "3. global.css: add the two small rules."
+    - "4. Run `pnpm build`. Check the built HTML: 9 hero links and 27 card links (3 sets x 9), no target attributes."
+    - "5. Manual check: click a slide and a card (including a side card) and confirm same-tab navigation; scrolling or swiping the Hero carousel does not navigate; dots, arrows and autoplay still work."
+
+acceptance_criteria:
+  - id: "AC1"
+    requirement: "All 9 Hero slides link to the matching /proyectos/{id} page per the mapping."
+  - id: "AC2"
+    requirement: "All 9 project cards link to the matching /proyectos/{id} page per the mapping, in the visible set and in the clone sets."
+  - id: "AC3"
+    requirement: "Navigation happens in the same tab. No link has a target attribute."
+  - id: "AC4"
+    requirement: "Hero slides still fill the frame (image not shrunk), and swiping or scrolling does not trigger a navigation."
+  - id: "AC5"
+    requirement: "Projects carousel autoplay, arrows and keyboard arrows still work. Side cards are clickable."
+  - id: "AC6"
+    requirement: "Links are keyboard focusable with a visible focus ring, and cloned cards are not in the tab order."
+  - id: "AC7"
+    requirement: "`pnpm build` passes and no unrelated files change."
+
+open_questions:
+  - "Should a side card in the projects carousel center first and only the center card navigate? Default: any click navigates."
+  - "Should Hero be reordered to match siteConfig.nav (economía, medio ambiente, seguridad, ...)? Default: keep the current order."
