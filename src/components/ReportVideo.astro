@@ -1,0 +1,17 @@
+---
+import { siteConfig } from '../config/site';
+
+const { video } = siteConfig;
+const status: string = video.status;
+const videoUrl: string | null = status === 'ready' && typeof video.url === 'string' ? video.url : null;
+---
+
+<section class="report-video">
+	{
+		videoUrl ? (
+			<iframe src={videoUrl} title="Video del informe" loading="lazy" allow="fullscreen" />
+		) : (
+			<p class="visually-hidden">Video del informe próximamente</p>
+		)
+	}
+</section>

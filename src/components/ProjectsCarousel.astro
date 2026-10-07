@@ -204,47 +204,51 @@ const sets = [0, 1, 2];
                 viewport.clientWidth / 2 -
                 (target.offsetLeft + target.offsetWidth / 2);
 
-            if (withTransition) {
-                track.style.removeProperty("transition");
-            } else {
-                track.style.transition = "none";
-            }
-
-            track.style.transform = `translateX(${delta}px)`;
-
             if (!withTransition) {
-                requestAnimationFrame(() =>
-                    track.style.removeProperty("transition"),
-                );
+                track.style.transition = "none";
+                track.style.transform = `translateX(${delta}px)`;
+                void track.offsetWidth;
+                track.style.removeProperty("transition");
+                return;
             }
-        };
 
-        const currentTranslateX = () => {
-            const transform = getComputedStyle(track).transform;
-            if (transform === "none") return 0;
-            return new DOMMatrixReadOnly(transform).m41;
+            track.style.removeProperty("transition");
+            track.style.transform = `translateX(${delta}px)`;
         };
 
         const normalize = () => {
             if (domIndex >= count && domIndex < count * 2) return;
 
             const shift = domIndex >= count * 2 ? -count : count;
-            const step = items[1].offsetLeft - items[0].offsetLeft;
 
+            items.forEach((item) => {
+                item.style.transition = "none";
+            });
             domIndex += shift;
-            track.style.transition = "none";
-            track.style.transform = `translateX(${currentTranslateX() - shift * step}px)`;
-            requestAnimationFrame(() =>
-                track.style.removeProperty("transition"),
-            );
+            applyActive();
+            center(false);
+            items.forEach((item) => {
+                item.style.removeProperty("transition");
+            });
         };
 
-        const goTo = (newDomIndex: number, withTransition = true) => {
+        const move = (delta: number) => {
             normalize();
 
-            domIndex = newDomIndex;
+            domIndex = Math.min(
+                Math.max(domIndex + delta, 0),
+                items.length - 1,
+            );
             applyActive();
-            center(withTransition);
+            center(true);
+        };
+
+        const moveToBase = (base: number) => {
+            normalize();
+
+            domIndex = count + base;
+            applyActive();
+            center(true);
         };
 
         const stopTimer = () => {
@@ -257,16 +261,16 @@ const sets = [0, 1, 2];
         const startTimer = () => {
             stopTimer();
             if (reducedMotion.matches || document.hidden) return;
-            timer = window.setInterval(() => goTo(domIndex + 1), AUTOPLAY_MS);
+            timer = window.setInterval(() => move(1), AUTOPLAY_MS);
         };
 
         prevBtn?.addEventListener("click", () => {
-            goTo(domIndex - 1);
+            move(-1);
             startTimer();
         });
 
         nextBtn?.addEventListener("click", () => {
-            goTo(domIndex + 1);
+            move(1);
             startTimer();
         });
 
@@ -277,18 +281,18 @@ const sets = [0, 1, 2];
             const index = Number((card as HTMLElement).dataset.index);
             if (Number.isNaN(index)) return;
 
-            goTo(count + index);
+            moveToBase(index);
             startTimer();
         });
 
         viewport.addEventListener("keydown", (event) => {
             if (event.key === "ArrowLeft") {
                 event.preventDefault();
-                goTo(domIndex - 1);
+                move(-1);
                 startTimer();
             } else if (event.key === "ArrowRight") {
                 event.preventDefault();
-                goTo(domIndex + 1);
+                move(1);
                 startTimer();
             }
         });
@@ -304,12 +308,6 @@ const sets = [0, 1, 2];
             } else {
                 startTimer();
             }
-        });
-
-        track.addEventListener("transitionend", (event) => {
-            if (event.target !== track || event.propertyName !== "transform")
-                return;
-            normalize();
         });
 
         const resizeObserver = new ResizeObserver(() => center(false));

@@ -1,0 +1,223 @@
+artifact_version: "1.2"
+
+feature:
+  name: "Menú principal del header (SiteMenu)"
+  goal: "Site-wide navigation to the 9 report pages, shown in the header of EVERY page (home and report pages). Desktop: inline white links with an animated underline on hover. Below the breakpoint: a burger button that opens an animated full-screen overlay. While open, the close control is the same burger icon dimmed to reduced opacity, in the same spot. The overlay blocks page scroll and clicks, and closes from that button, a click outside the links, or Esc."
+  location: "src/components/Header.astro, which Layout.astro already renders on every page. No per-page wiring."
+
+source_of_truth:
+  visual_reference: "No menu mockup was provided. The report screenshots only show the orange header bar with the white lion logo at the left."
+  user_requirements:
+    - "The menu appears on every page, including index and the internal report pages."
+    - "Link labels and hrefs live in src/config/site.ts, so the user manages the links there."
+    - "Link text is white."
+    - "Smooth transition for the line that appears below a link on hover."
+    - "The close icon is NOT an X: it is the same burger icon, but at reduced opacity."
+    - "The overlay has an appear and a disappear animation."
+    - "Mobile: burger menu that covers the whole page, blocks scroll and clicks on the page behind it, closes on outside click or the close button."
+    - "Keep it simple. No adapter."
+
+observations:
+  direct:
+    - "The header is an orange sticky bar (.site-header) with only the white logo link at the left."
+    - "Report routes are /proyectos/{id} where id is the MDX filename: economia, medio-ambiente, seguridad, movilidad, agua, salud, ayudamos, capullos, espacios-publicos (collection `order` 1 to 9)."
+    - "src/config/site.ts already holds site-wide data (siteConfig with title, social links, etc.), typed with small interfaces."
+    - "Layout.astro renders <Header /> on every page, so a menu placed in Header.astro is automatically global."
+    - "global.css already has `.site-header__brand:focus-visible { outline-color: var(--color-text-inverse) }`, which is the pattern for focus on orange."
+    - "global.css already shortens all transitions/animations under prefers-reduced-motion."
+  inferred:
+    - "Menu items are the 9 report titles in collection order. There is no 'Inicio' item, the logo already links home."
+    - "Burger breakpoint is 64rem, not the project's usual 48rem. Nine labels will not fit in one line at 768px."
+    - "Desktop (no spec given): the same links inline in the header, no burger."
+    - "Overlay background is the brand orange, same as the header, so it reads as the header growing to full screen, with the burger dimming in place to become the close button."
+  uncertain:
+    - "Exact opacity of the dimmed burger and animation timings are not specified. Proposed values are below."
+
+repository_context:
+  relevant_files:
+    - "src/config/site.ts (modify: add the `nav` list and a NavLink type)"
+    - "src/components/Header.astro (modify: render the menu using siteConfig.nav)"
+    - "src/styles/global.css (add a 'Menú principal' block right after the '.site-header' rules)"
+    - "src/layouts/Layout.astro (NO change needed)"
+    - "src/pages/proyectos/[id].astro (NO change needed)"
+  reusable_components: [".container", ".site-header", ".site-header__inner (becomes a flex row: logo left, menu right)", ".visually-hidden"]
+  reusable_tokens:
+    - "--color-text-inverse (link text, icon bars, focus ring), --color-orange (overlay background), --color-orange-dark (optional, see open_questions)"
+    - "--font-display (overlay links), --font-body or --font-extended (desktop links), --font-size-xs (desktop), --font-size-2xl (overlay)"
+    - "--space-* scale, --radius-sm, --transition-base (200ms ease, the base for hover), --header-height, --gutter"
+  constraints:
+    - "No adapter, framework, library or new dependency. The site stays static."
+    - "Use the native <dialog> opened with showModal() (focus trap, inert page, Esc and top layer for free)."
+    - "BEM class names with prefix .site-menu. Do not reuse .carousel, .projects, .arrow-btn."
+    - "Only vanilla JS in an inline <script> in the component. Animations are CSS."
+    - "Typography and colors from global.css tokens only. No hardcoded colors."
+
+site_config_changes:
+  file: "src/config/site.ts"
+  add:
+    - "export interface NavLink { href: string; label: string; }"
+    - "A `nav: NavLink[]` property inside siteConfig, in this order, so the user edits labels/hrefs/order there:"
+  nav_values:
+    - "{ href: '/proyectos/economia', label: 'Economía' }"
+    - "{ href: '/proyectos/medio-ambiente', label: 'Medio ambiente' }"
+    - "{ href: '/proyectos/seguridad', label: 'Seguridad' }"
+    - "{ href: '/proyectos/movilidad', label: 'Movilidad' }"
+    - "{ href: '/proyectos/agua', label: 'Agua' }"
+    - "{ href: '/proyectos/salud', label: 'Salud' }"
+    - "{ href: '/proyectos/ayudamos', label: 'Ayudamos' }"
+    - "{ href: '/proyectos/capullos', label: 'Capullos' }"
+    - "{ href: '/proyectos/espacios-publicos', label: 'Espacios públicos' }"
+  notes:
+    - "Keep the file's existing style (tabs, `as const` object, `satisfies` where it already uses it). Type the list with NavLink so typos in keys fail at build."
+    - "The list is now manual, not derived from the collection. Adding a new MDX report means adding one line here. Mention this in a short comment above `nav`."
+
+structure:
+  root: "<header class='site-header'> > .container.site-header__inner"
+  children:
+    - "a.site-header__brand (existing logo link, unchanged)"
+    - "div.site-menu[data-site-menu]"
+    - "  nav.site-menu__inline[aria-label='Menú principal'] > ul > li > a.site-menu__link  (desktop, hidden below 64rem)"
+    - "  button.site-menu__toggle[type=button][aria-label='Abrir menú'][aria-haspopup='dialog'][aria-expanded='false'] > span.site-menu__bars > 3 x span.site-menu__bar  (burger, hidden from 64rem up)"
+    - "  dialog.site-menu__dialog[aria-label='Menú principal']"
+    - "    div.site-menu__panel"
+    - "      button.site-menu__close[type=button][aria-label='Cerrar menú'] > span.site-menu__bars > 3 x span.site-menu__bar  (identical icon markup to the toggle, dimmed)"
+    - "      nav[aria-label='Menú principal'] > ul.site-menu__list > li > a.site-menu__link"
+  semantic_notes:
+    - "Header.astro imports siteConfig and loops over siteConfig.nav twice (inline list and overlay list). No props, no changes to Layout or the report pages."
+    - "Optionally extract the markup to src/components/SiteMenu.astro (props: links, currentPath) if Header.astro gets long. Either location is acceptable, keep the class names."
+    - "Current page: compare Astro.url.pathname (trailing slash stripped) with each href. Set aria-current='page' on the match in both lists. The home page has no current item."
+
+layout:
+  container:
+    width: "100% (header bar), content in .container"
+    max_width: "var(--content-lg) via .container"
+    min_height: "var(--header-height) (unchanged)"
+    overflow: "visible"
+  desktop:
+    model: "flex"
+    columns: "logo left, menu right (margin-inline-start: auto on .site-menu)"
+    alignment: "align-items center. Links in one row, gap var(--space-sm) to var(--space-md), white-space nowrap."
+    proportions: "All 9 links must fit on one line at 1024px. If they do not, raise the breakpoint instead of wrapping."
+  tablet:
+    behavior: "Below 64rem same as mobile (burger)."
+  mobile:
+    behavior: "Burger at the right end of the header, 2.75rem square hit area. The dialog covers the full viewport: position fixed (dialog default), inset 0, width 100vw, height 100dvh, max-width/max-height none, margin 0, padding 0, border 0. Panel: centered column (width min(100%, var(--content-sm)), margin auto), links stacked with gap var(--space-md), text centered. Panel gets overflow-y auto only for short landscape screens."
+    stacking_order: ["dimmed burger close button (top right, exactly over the header burger position)", "9 links in siteConfig.nav order"]
+  close_button_position: "The close button inside the dialog must sit at exactly the same screen position and size as the header burger (same right gutter, same top offset = header vertical centering), showing the same icon dimmed. This makes the burger look like it stays in place, only fading to reduced opacity, when the overlay opens."
+
+visual:
+  background: "Dialog: var(--color-orange). ::backdrop: transparent (the dialog covers everything)."
+  border_radius: "none on the dialog. Focus ring radius var(--radius-sm)."
+  border: "none"
+  shadow: "none"
+  typography:
+    - "Overlay links: --font-display, uppercase, --font-size-2xl, tight line-height, weight 700."
+    - "Desktop links: --font-body (or --font-extended), weight 700, --font-size-xs, uppercase, letter-spacing about 0.04em (same feel as .hero__etiqueta)."
+  spacing: ["Link vertical padding var(--space-2xs), so every link is at least 44px high", "Panel padding var(--space-lg) plus --gutter on the sides"]
+  colors:
+    - "All link text, burger bars and focus rings: var(--color-text-inverse) (white), as requested."
+    - "Focus-visible: outline-color var(--color-text-inverse), same as .site-header__brand:focus-visible."
+    - "Known tradeoff, accepted by the user: white on --color-orange is about 2.4:1 and does not reach WCAG AA. Mitigations that are part of the spec: bold weight, large overlay text, the underline indicator, and the optional darker overlay background in open_questions."
+  link_hover_line:
+    - "Applies to .site-menu__link in both the desktop list and the overlay list."
+    - "Link is position: relative, display: inline-block. The line is an ::after pseudo-element: content '', position absolute, left 0, right 0, bottom 0 (or -0.2em), height 2px, background currentColor (white), border-radius var(--radius-pill)."
+    - "Resting state: transform scaleX(0), transform-origin left center."
+    - "Hover and focus-visible state: transform scaleX(1)."
+    - "aria-current='page' keeps the line at scaleX(1) permanently."
+    - "Transition: transform var(--transition-base). Optionally 250ms ease-out. Animate transform only (not width) for smoothness."
+    - "No color change on hover. Keep text white."
+  close_icon_dimmed_burger:
+    - "The close button uses the EXACT same icon markup and styles as the header burger: .site-menu__bars (about 1.5rem wide box) containing 3 .site-menu__bar spans, each 100% wide, 2px high, background var(--color-text-inverse), border-radius var(--radius-pill), stacked with about 0.4rem gaps. No shape change, no X."
+    - "While the dialog is open, the bars are dimmed: opacity var(--site-menu-close-opacity, 0.5). Define --site-menu-close-opacity: 0.5 on .site-menu so it is tweakable."
+    - "Smooth hand-off: on open, the bars start at opacity 1 (via @starting-style on the dialog[open] rule, same mechanism as the overlay) and transition to 0.5 over 300ms ease, matching the overlay fade. On close they transition back toward full opacity while the overlay fades out."
+    - "Hover/active on the close button: raise opacity to 0.75 for feedback, transition var(--transition-base)."
+    - "Transitions on opacity only."
+  overlay_animation:
+    - "Appear: opacity 0 to 1 and translateY(-1rem) to 0 over 300ms ease."
+    - "Disappear: reverse (opacity 1 to 0, translateY back to -1rem) over 300ms, then the dialog is hidden."
+    - "Implementation approach (CSS only, no JS timers): on .site-menu__dialog set `opacity: 0; transform: translateY(-1rem); transition: opacity 300ms ease, transform 300ms ease, overlay 300ms allow-discrete, display 300ms allow-discrete;`. On `.site-menu__dialog[open]` set opacity 1 and transform none. Add `@starting-style { .site-menu__dialog[open] { opacity: 0; transform: translateY(-1rem); } }`."
+    - "Browser support: @starting-style and transition-behavior allow-discrete (Chrome/Edge 117+, Safari 17.5+, Firefox 129+). Older browsers get the same open/close without animation, which is acceptable, nothing breaks."
+    - "prefers-reduced-motion: the existing global rule already sets transition-duration to 0.01ms, so no extra code is needed. Verify it."
+  interaction: "Do not add other animations (no link stagger, no scale, no backdrop blur)."
+
+behavior:
+  open_close:
+    - "Burger click: dialog.showModal(). The page behind becomes inert (no clicks, no focus) and focus is trapped."
+    - "Close (dimmed burger) click: dialog.close()."
+    - "Outside click: click listener on the dialog, `if (event.target === dialog) dialog.close()`. Because the panel is a centered column inside the full-screen dialog, the empty orange area around it is 'outside'."
+    - "Esc closes it (native)."
+    - "Clicking a link navigates (full page load), nothing extra."
+    - "A `matchMedia('(min-width: 64rem)')` change listener closes the dialog if it is open, so the overlay and scroll lock never survive a resize to desktop."
+    - "Keep aria-expanded on the toggle in sync: true on open, false on the dialog's `close` event."
+    - "Focus returns to the burger on close (native)."
+  scroll_lock: "Pure CSS: `html:has(.site-menu__dialog[open]) { overflow: hidden; }`. No JS class toggling."
+  script:
+    - "Inline <script> in the component. Query `[data-site-menu]`. About 15 to 20 lines. No state variables."
+
+responsive_behavior:
+  rules:
+    - "`@media (min-width: 64rem)`: hide .site-menu__toggle and the dialog (display: none !important), show .site-menu__inline."
+    - "`@media (max-width: 63.999rem)`: hide .site-menu__inline, show the toggle."
+    - "No horizontal overflow of the header at 320px."
+
+accessibility:
+  requirements:
+    - "Burger and close are <button>s with aria-labels 'Abrir menú' / 'Cerrar menú'. The toggle has aria-haspopup='dialog' and aria-expanded."
+    - "Bars are decorative: the spans inside the buttons have no text, the aria-label carries the name. Because the open and closed icons look the same (only dimmed), the labels, not the icon, communicate the state change."
+    - "The dialog and both navs are labelled. Only one nav is rendered visible at a time (display none removes the other from the accessibility tree)."
+    - "aria-current='page' on the current link."
+    - "Visible focus ring on every control (white on orange, see visual). The dimmed close button keeps a fully visible focus ring."
+    - "Touch targets at least 44px (toggle, close, each overlay link)."
+    - "Run the available skill `web-design-guidelines` on the final markup and report the contrast result for white on orange. This is expected to flag the known tradeoff. Do not change the white text without the user's approval."
+
+implementation_plan:
+  modify:
+    - "src/config/site.ts: add NavLink type and `nav` list."
+    - "src/components/Header.astro: render the menu from siteConfig.nav (logo unchanged), compute current path, include the inline script."
+    - "src/styles/global.css: add a 'Menú principal' block after the .site-header block: header row layout, inline links, link hover line, toggle/close buttons, shared burger icon, dimmed close state, dialog reset, overlay animation, panel and list, scroll lock, breakpoints."
+  create:
+    - "Optional: src/components/SiteMenu.astro if Header.astro becomes too long."
+  reuse: ["tokens listed above", ".site-header structure and its focus pattern", "the global reduced-motion rule"]
+  avoid:
+    - "Any adapter, library, client directive or framework island"
+    - "Touching Layout.astro, [id].astro, the collection or the MDX files"
+    - "Deriving links from getCollection (links are managed manually in site.ts by request)"
+    - "An X icon or any shape morph on the bars"
+    - "JS-managed body classes for scroll lock, JS timers or transitionend handlers for the animations"
+    - "Animating width/height/top (use transform and opacity)"
+    - "Hardcoded colors or fonts"
+  ordered_steps:
+    - "1. Add NavLink and `nav` to site.ts."
+    - "2. Update Header.astro: markup, current-page logic, script."
+    - "3. Add the CSS block in global.css."
+    - "4. Test open/close in a real browser: the burger stays visually in place and dims while the overlay fades in and out, hover line on desktop and in the overlay, all close paths, scroll lock, resize while open, keyboard."
+    - "5. Run the web-design-guidelines skill and report contrast."
+    - "6. Run `pnpm build`. Confirm the menu is on `/` and on all 9 `/proyectos/*` pages."
+
+acceptance_criteria:
+  - id: "AC1"
+    requirement: "The menu is present in the header of the home page and all 9 report pages."
+  - id: "AC2"
+    requirement: "Link labels, hrefs and order come only from siteConfig.nav in src/config/site.ts. Changing a label there changes it in both menus. No link is hardcoded in components."
+  - id: "AC3"
+    requirement: "Link text, burger bars and focus ring are white. The current page link has aria-current='page' and keeps its underline."
+  - id: "AC4"
+    requirement: "Hovering or keyboard-focusing a link makes a 2px white line grow from left to right smoothly (transform transition about 200ms) and shrink back on leave, in the desktop list and in the overlay list."
+  - id: "AC5"
+    requirement: "Below 64rem a burger shows at the right of the header. When the overlay opens, the close button shows the SAME burger icon (no X) at the same position and size, dimmed to about 0.5 opacity, and returns to full opacity on close."
+  - id: "AC6"
+    requirement: "The overlay fades and slides in on open, and fades and slides out on close, without leaving a flash or a stuck dialog. Browsers without allow-discrete just open/close instantly."
+  - id: "AC7"
+    requirement: "While open, the page behind cannot scroll, be clicked or be tabbed into. It closes with the dimmed burger button, with a click on the empty area outside the link panel, and with Esc, and focus returns to the burger."
+  - id: "AC8"
+    requirement: "From 64rem up, the burger is hidden and the 9 links sit on one row. Resizing to desktop with the overlay open closes it and restores scrolling."
+  - id: "AC9"
+    requirement: "With prefers-reduced-motion: reduce there is no visible animation."
+  - id: "AC10"
+    requirement: "No adapter or dependency added, Layout and [id].astro unchanged, `pnpm build` passes, output remains static. No horizontal overflow at 320px and all touch targets are at least 44px."
+
+open_questions:
+  - "Contrast (accepted tradeoff): white text on --color-orange fails WCAG AA. Optional improvement: use var(--color-orange-dark) as the overlay background only (white on it is about 3.4:1, enough for the large overlay text). Keep plain --color-orange (default) or switch the overlay to orange-dark?"
+  - "Is 0.5 the right resting opacity for the dimmed close burger? The plan exposes it as --site-menu-close-opacity so it is a one-line tweak."
+  - "Breakpoint 64rem instead of the project's 48rem, because 9 labels do not fit on one line at tablet width. OK?"
+  - "Should the overlay include an 'Inicio' link? Default: no, the logo goes home (but the logo is covered while the overlay is open)."

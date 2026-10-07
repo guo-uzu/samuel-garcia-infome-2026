@@ -1,0 +1,26 @@
+---
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+	desktop: ImageMetadata;
+	mobile: ImageMetadata;
+	alt: string;
+}
+
+const { desktop, mobile, alt } = Astro.props;
+---
+
+<div class="report-hero">
+	<picture>
+		<source media="(max-width: 47.999rem)" srcset={mobile.src} />
+		<img
+			src={desktop.src}
+			alt={alt}
+			width={desktop.width}
+			height={desktop.height}
+			loading="eager"
+			decoding="async"
+			draggable="false"
+		/>
+	</picture>
+</div>

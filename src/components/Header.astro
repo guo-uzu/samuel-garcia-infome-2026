@@ -1,6 +1,7 @@
 ---
 import { siteConfig } from "../config/site";
 import logo from "../assets/nl-logo-white.svg";
+import SiteMenu from "./SiteMenu.astro";
 ---
 
 <header class="site-header">
@@ -19,5 +20,6 @@ import logo from "../assets/nl-logo-white.svg";
                 decoding="async"
             />
         </a>
+        <SiteMenu links={siteConfig.nav} />
     </div>
 </header>

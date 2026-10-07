@@ -1,0 +1,12 @@
+---
+import hands from '../assets/icons/hands-icon.svg';
+---
+
+<aside class="report-callout">
+	<span class="report-callout__badge">
+		<img src={hands.src} alt="" width={hands.width} height={hands.height} loading="lazy" decoding="async" />
+	</span>
+	<div class="report-callout__body">
+		<slot />
+	</div>
+</aside>

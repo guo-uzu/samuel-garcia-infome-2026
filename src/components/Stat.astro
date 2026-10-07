@@ -1,0 +1,19 @@
+---
+import medal from '../assets/icons/medal-icon.svg';
+import police from '../assets/icons/police-icon.svg';
+import pointer from '../assets/icons/pointer-icon.svg';
+
+interface Props {
+	icon: 'medal' | 'police' | 'pointer';
+}
+
+const icons = { medal, police, pointer } as const;
+
+const { icon } = Astro.props;
+const art = icons[icon];
+---
+
+<span class="report-stat">
+	<img src={art.src} alt="" width={art.width} height={art.height} loading="lazy" decoding="async" />
+	<span class="report-stat__text"><slot /></span>
+</span>

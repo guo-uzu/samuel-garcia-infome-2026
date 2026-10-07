@@ -1,0 +1,108 @@
+---
+import type { NavLink } from "../config/site";
+
+interface Props {
+    links: readonly NavLink[];
+}
+
+const { links } = Astro.props;
+const currentPath = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const isCurrent = (href: string) => href === currentPath;
+---
+
+<div class="site-menu" data-site-menu>
+    <nav class="site-menu__inline" aria-label="Menú principal">
+        <ul class="site-menu__inline-list">
+            {
+                links.map((link) => (
+                    <li>
+                        <a
+                            class="site-menu__link"
+                            href={link.href}
+                            aria-current={isCurrent(link.href) ? "page" : undefined}
+                        >
+                            {link.label}
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </nav>
+
+    <button
+        class="site-menu__toggle"
+        type="button"
+        aria-label="Abrir menú"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+    >
+        <span class="site-menu__bars" aria-hidden="true">
+            <span class="site-menu__bar" />
+            <span class="site-menu__bar" />
+            <span class="site-menu__bar" />
+        </span>
+    </button>
+
+    <dialog class="site-menu__dialog" aria-label="Menú principal">
+        <div class="site-menu__panel">
+            <button class="site-menu__close" type="button" aria-label="Cerrar menú">
+                <span class="site-menu__bars" aria-hidden="true">
+                    <span class="site-menu__bar" />
+                    <span class="site-menu__bar" />
+                    <span class="site-menu__bar" />
+                </span>
+            </button>
+            <nav aria-label="Menú principal">
+                <ul class="site-menu__list">
+                    {
+                        links.map((link) => (
+                            <li>
+                                <a
+                                    class="site-menu__link"
+                                    href={link.href}
+                                    aria-current={isCurrent(link.href) ? "page" : undefined}
+                                >
+                                    {link.label}
+                                </a>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </nav>
+        </div>
+    </dialog>
+</div>
+
+<script>
+    function initSiteMenu(menu: HTMLElement) {
+        const dialog = menu.querySelector<HTMLDialogElement>(".site-menu__dialog");
+        const toggle = menu.querySelector<HTMLButtonElement>(".site-menu__toggle");
+
+        if (!dialog || !toggle) return;
+
+        const closeBtn = dialog.querySelector<HTMLButtonElement>(".site-menu__close");
+        if (!closeBtn) return;
+
+        toggle.addEventListener("click", () => {
+            dialog.showModal();
+            toggle.setAttribute("aria-expanded", "true");
+        });
+
+        closeBtn.addEventListener("click", () => dialog.close());
+
+        dialog.addEventListener("close", () =>
+            toggle.setAttribute("aria-expanded", "false"),
+        );
+
+        dialog.addEventListener("click", (event) => {
+            if (event.target === dialog) dialog.close();
+        });
+
+        const desktop = window.matchMedia("(min-width: 72rem)");
+        desktop.addEventListener("change", (event) => {
+            if (event.matches && dialog.open) dialog.close();
+        });
+    }
+
+    document.querySelectorAll<HTMLElement>("[data-site-menu]").forEach(initSiteMenu);
+</script>

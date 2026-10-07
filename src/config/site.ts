@@ -9,12 +9,30 @@ export interface SocialLink extends ResourceLink {
 	label: string;
 }
 
+export interface NavLink {
+	href: string;
+	label: string;
+}
+
 export const siteConfig = {
 	lang: 'es-MX',
-	title: 'Samuel García — Quinto Informe',
+  title: 'Samuel García — Quinto Informe',
+	favicon: "/nl-logo-orange.svg",
 	description:
 		'Quinto Informe de Gobierno de Samuel García. Conoce los resultados y el avance de Nuevo León: seguridad, movilidad, agua, salud y más.',
 	url: 'https://informenuevoleon2026.mx',
+	// nav: main menu links in display order. Add one line per new report page.
+	nav: [
+		{ href: '/proyectos/economia', label: 'Economía' },
+		{ href: '/proyectos/medio-ambiente', label: 'Medio ambiente' },
+		{ href: '/proyectos/seguridad', label: 'Seguridad' },
+		{ href: '/proyectos/movilidad', label: 'Movilidad' },
+		{ href: '/proyectos/agua', label: 'Agua' },
+		{ href: '/proyectos/salud', label: 'Salud' },
+		{ href: '/proyectos/ayudamos', label: 'Ayudamos' },
+		{ href: '/proyectos/capullos', label: 'Capullos' },
+		{ href: '/proyectos/espacios-publicos', label: 'Espacios públicos' },
+	] satisfies readonly NavLink[],
 	video: {
 		status: 'coming-soon',
 		url: null,
