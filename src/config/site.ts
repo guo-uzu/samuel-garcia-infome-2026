@@ -23,8 +23,6 @@ export const siteConfig = {
 	url: 'https://informenuevoleon2026.mx',
 	// nav: main menu links in display order. Add one line per new report page.
 	nav: [
-		{ href: '/proyectos/economia', label: 'Economía' },
-		{ href: '/proyectos/medio-ambiente', label: 'Medio ambiente' },
 		{ href: '/proyectos/seguridad', label: 'Seguridad' },
 		{ href: '/proyectos/movilidad', label: 'Movilidad' },
 		{ href: '/proyectos/agua', label: 'Agua' },
@@ -32,6 +30,8 @@ export const siteConfig = {
 		{ href: '/proyectos/ayudamos', label: 'Ayudamos' },
 		{ href: '/proyectos/capullos', label: 'Capullos' },
 		{ href: '/proyectos/espacios-publicos', label: 'Espacios públicos' },
+		{ href: '/proyectos/economia', label: 'Economía' },
+		{ href: '/proyectos/medio-ambiente', label: 'Medio ambiente' },
 	] satisfies readonly NavLink[],
 	video: {
 		status: 'coming-soon',
