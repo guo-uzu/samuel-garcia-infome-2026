@@ -7,6 +7,7 @@ import ReportVideo from "../../components/ReportVideo.astro";
 import Stat from "../../components/Stat.astro";
 import Callout from "../../components/Callout.astro";
 import Detail from "../../components/Detail.astro";
+import ReportsVideoMobile from "../../components/ReportsVideoMobile.astro";
 
 export async function getStaticPaths() {
     const reports = await getCollection("reports");
@@ -26,7 +27,7 @@ const { Content } = await render(entry);
 
 <Layout title={entry.data.title} description={entry.data.description}>
     <main id="contenido">
-        <!--<ReportVideo /> -->
+        <ReportVideo />
         <div class="container report">
             <ReportHero
                 desktop={entry.data.imageDesktop}
@@ -42,7 +43,7 @@ const { Content } = await render(entry);
             <div class="report-prose">
                 <Content components={{ Stat, Callout, Detail }} />
             </div>
-            <div class="visually-hidden">Here should be the video</div>
+            <ReportsVideoMobile />
             <div class="report__return-container">
                 <a class="report__return" href="/">
                     <svg

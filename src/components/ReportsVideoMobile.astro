@@ -1,0 +1,36 @@
+---
+import { siteConfig } from "../config/site";
+import { YouTube } from "@astro-community/astro-embed-youtube";
+
+const { videosIndividualPage } = siteConfig;
+
+const sectionName = Astro.url.pathname.split("/").filter(Boolean).at(-1);
+
+type IndividualVideo = {
+    status: "ready" | "coming-soon";
+    url: string | null;
+    poster: string | null;
+    urlMobile: string | null;
+};
+
+const video =
+    sectionName && sectionName in videosIndividualPage
+        ? (videosIndividualPage[
+              sectionName as keyof typeof videosIndividualPage
+          ] as IndividualVideo)
+        : null;
+
+const shouldShowVideo = video?.status === "ready";
+---
+
+{shouldShowVideo && (
+    <section class="hero__individual__mobile">
+        {video.url && (
+            <YouTube
+                class="hero__youtube__mobile"
+                posterQuality="high"
+                id={video.urlMobile ?? ""}
+            />
+        )}
+    </section>
+)}

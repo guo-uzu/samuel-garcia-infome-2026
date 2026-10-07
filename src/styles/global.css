@@ -406,6 +406,12 @@ html:has(.site-menu__dialog[open]) {
     max-width: 100% !important;
     max-height: 800px;
 }
+.hero__youtube__mobile {
+    aspect-ratio: 9/16;
+    max-height: 850px;
+    margin: 0 auto;
+
+}
 
 .hero__etiqueta {
 	max-width: var(--content-sm);
@@ -884,9 +890,19 @@ html:has(.site-menu__dialog[open]) {
 	object-position: center;
 }
 
+.hero__individual__mobile {
+    display: none;
+}
+
 @media (max-width: 47.999rem) {
 	.report-hero {
 		aspect-ratio: 3 / 4;
+	}
+	.hero__individual {
+        display: none;
+	}
+	.hero__individual__mobile {
+	    display: initial;
 	}
 }
 
@@ -1045,6 +1061,7 @@ html:has(.site-menu__dialog[open]) {
 .report__return-container {
     display: flex;
     justify-content: right;
+    padding-top: 30px;
 }
 
 .report__return{

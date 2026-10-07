@@ -1,17 +1,106 @@
 ---
-import { siteConfig } from '../config/site';
+import { siteConfig } from "../config/site";
+import { YouTube } from "@astro-community/astro-embed-youtube";
 
-const { video } = siteConfig;
-const status: string = video.status;
-const videoUrl: string | null = status === 'ready' && typeof video.url === 'string' ? video.url : null;
+const { videosIndividualPage } = siteConfig;
+
+const sectionName = Astro.url.pathname.split("/").filter(Boolean).at(-1);
+
+type IndividualVideo = {
+    status: "ready" | "coming-soon";
+    url: string | null;
+    poster: string | null;
+    urlMobile: string | null;
+};
+
+const video =
+    sectionName && sectionName in videosIndividualPage
+        ? (videosIndividualPage[
+              sectionName as keyof typeof videosIndividualPage
+          ] as IndividualVideo)
+        : null;
+
+const shouldShowVideo = video?.status === "ready";
 ---
 
-<section class="report-video">
-	{
-		videoUrl ? (
-			<iframe src={videoUrl} title="Video del informe" loading="lazy" allow="fullscreen" />
-		) : (
-			<p class="visually-hidden">Video del informe próximamente</p>
-		)
-	}
-</section>
+{shouldShowVideo && (
+    <section class="hero__individual">
+        {video.url && (
+            <YouTube
+                class="hero__youtube"
+                id={video.url}
+                posterQuality="high"
+            />
+        )}
+    </section>
+)}
+
+<script>
+    interface YouTubePlayer {
+        mute(): void;
+        playVideo(): void;
+        pauseVideo(): void;
+        stopVideo(): void;
+    }
+
+    interface LiteYouTubeElement extends HTMLElement {
+        getYTPlayer(): Promise<YouTubePlayer>;
+    }
+
+    const desktopMedia = window.matchMedia("(min-width: 769px)");
+
+    let player: YouTubePlayer | null = null;
+
+    async function handleHeroVideo() {
+        const youtube =
+            document.querySelector<LiteYouTubeElement>(".hero__youtube");
+
+        if (!youtube) return;
+
+        // MOBILE: don't initialize YouTube just to stop it.
+        // If it was already initialized on desktop, stop + mute it.
+        if (!desktopMedia.matches) {
+            if (player) {
+                player.mute();
+                player.stopVideo();
+            }
+
+            return;
+        }
+
+        // DESKTOP ONLY
+        await customElements.whenDefined("lite-youtube");
+
+        try {
+            // Initialize only once
+            if (!player) {
+                player = await youtube.getYTPlayer();
+            }
+
+            // Muting is required for reliable browser autoplay
+            player.mute();
+            player.playVideo();
+        } catch (error) {
+            console.error("Could not autoplay hero video:", error);
+        }
+    }
+
+    // Initial page load
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", handleHeroVideo, {
+            once: true,
+        });
+    } else {
+        handleHeroVideo();
+    }
+
+    // Astro View Transitions / ClientRouter
+    document.addEventListener("astro:page-load", () => {
+        // New page may contain a different <lite-youtube>
+        player = null;
+        handleHeroVideo();
+    });
+
+    // React when crossing the 768px breakpoint
+    desktopMedia.addEventListener("change", handleHeroVideo);
+</script>

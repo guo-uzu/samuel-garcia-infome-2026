@@ -5,7 +5,13 @@ import { siteConfig } from "../config/site";
 ---
 
 <section class="hero" aria-labelledby="hero-etiqueta">
-    <YouTube class="hero__youtube" id={siteConfig.video.url} />
+    <YouTube
+        class="hero__youtube"
+        poster={siteConfig.video.poster ?? ""}
+        posterQuality="high"
+        id={siteConfig.video.url}
+        params="controls=1&rel=0&playsinline=1"
+    />
 </section>
 
 <section class="intro" aria-label="Mensaje institucional">
@@ -58,3 +64,54 @@ import { siteConfig } from "../config/site";
         </div>
     </div>
 </section>
+
+<script>
+    interface YouTubePlayer {
+        mute(): void;
+        playVideo(): void;
+    }
+
+    interface LiteYouTubeElement extends HTMLElement {
+        getYTPlayer(): Promise<YouTubePlayer>;
+    }
+
+    async function autoplayHeroVideo() {
+        // Wait until <lite-youtube> has been registered
+        await customElements.whenDefined("lite-youtube");
+
+        const youtube =
+            document.querySelector<LiteYouTubeElement>(".hero__youtube");
+
+        if (!youtube) return;
+
+        // Prevent initializing it twice
+        if (youtube.dataset.autoplayInitialized === "true") return;
+
+        youtube.dataset.autoplayInitialized = "true";
+
+        try {
+            // getYTPlayer() also activates/loads the real YouTube iframe
+            const player = await youtube.getYTPlayer();
+
+            // Autoplay is normally blocked unless the video is muted
+            player.playVideo();
+        } catch (error) {
+            console.error("Could not autoplay hero video:", error);
+
+            // Allow retry if Astro navigates/re-renders
+            youtube.dataset.autoplayInitialized = "false";
+        }
+    }
+
+    // Normal page load
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", autoplayHeroVideo, {
+            once: true,
+        });
+    } else {
+        autoplayHeroVideo();
+    }
+
+    // Also works if you're using Astro View Transitions / ClientRouter
+    document.addEventListener("astro:page-load", autoplayHeroVideo);
+</script>
