@@ -252,14 +252,6 @@ const sets = [0, 1, 2];
             center(true);
         };
 
-        const moveToBase = (base: number) => {
-            normalize();
-
-            domIndex = count + base;
-            applyActive();
-            center(true);
-        };
-
         const stopTimer = () => {
             if (timer !== undefined) {
                 window.clearInterval(timer);
