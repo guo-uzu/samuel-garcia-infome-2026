@@ -42,7 +42,7 @@ export const siteConfig = {
     movilidad: {
       status: "ready",
       url: "https://youtu.be/2CUTIhS_FRA",
-      poster: null,
+      poster: "",
       urlMobile: "https://youtube.com/shorts/t5F-kRAo_mM",
     } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
     agua: {
