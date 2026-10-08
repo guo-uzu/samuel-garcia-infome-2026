@@ -1,25 +1,18 @@
 ---
+import { YouTube } from "@astro-community/astro-embed-youtube";
 import samuelGarcia from "../assets/samuelGarcia.webp";
 import { siteConfig } from "../config/site";
-
-const heroVideoUrl = siteConfig.video.url
-    ? `https://www.youtube-nocookie.com/embed/${siteConfig.video.url}?autoplay=1&mute=1&playsinline=1&rel=0`
-    : null;
 ---
 
 <section class="hero" aria-labelledby="hero-etiqueta">
-    {
-        heroVideoUrl && (
-            <iframe
-                class="hero__youtube hero__youtube--iframe"
-                src={heroVideoUrl}
-                title="Mensaje de Samuel García"
-                allow="autoplay; encrypted-media; picture-in-picture"
-                allowfullscreen
-                referrerpolicy="strict-origin-when-cross-origin"
-            ></iframe>
-        )
-    }
+    {siteConfig.video.url && (
+        <YouTube
+            class="hero__youtube"
+            id={siteConfig.video.url}
+            posterQuality="high"
+            title="Siendo incorruptibles, lo nuevo sí cumple en Nuevo León"
+        />
+    )}
 </section>
 
 <section class="intro" aria-label="Mensaje institucional">

@@ -44,10 +44,55 @@ export const siteConfig = {
       url: "https://youtu.be/2CUTIhS_FRA",
       poster: null,
       urlMobile: "https://youtube.com/shorts/t5F-kRAo_mM",
-    } satisfies ResourceLink & {
-      poster: string | null;
-      urlMobile: string | null;
-    },
+    } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
+    agua: {
+      status: "coming-soon",
+      url: null,
+      poster: null,
+      urlMobile: null,
+    } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
+    ayudamos: {
+      status: "coming-soon",
+      url: null,
+      poster: null,
+      urlMobile: null,
+    } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
+    capullos: {
+      status: "coming-soon",
+      url: null,
+      poster: null,
+      urlMobile: null,
+    } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
+    economia: {
+      status: "coming-soon",
+      url: null,
+      poster: null,
+      urlMobile: null,
+    } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
+    "espacios-publicos": {
+      status: "ready",
+      url: "https://youtu.be/2CUTIhS_FRA",
+      poster: null,
+      urlMobile: "https://youtube.com/shorts/t5F-kRAo_mM",
+    }  satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
+    "medio-ambiente": {
+      status: "coming-soon",
+      url: null,
+      poster: null,
+      urlMobile: null,
+    } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
+    salud: {
+      status: "coming-soon",
+      url: null,
+      poster: null,
+      urlMobile: null,
+    } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
+    seguridad: {
+      status: "coming-soon",
+      url: null,
+      poster: null,
+      urlMobile: null,
+    } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
   },
   download: {
     status: "coming-soon",

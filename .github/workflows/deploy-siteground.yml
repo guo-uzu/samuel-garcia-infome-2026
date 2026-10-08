@@ -1,0 +1,132 @@
+name: Deploy SiteGround
+
+"on":
+  # Cada push a main actualiza automaticamente STAGING.
+  push:
+    branches:
+      - main
+
+  # Una ejecucion manual desde main despliega PRODUCCION.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    # Seguridad extra: los deploys manuales solo se permiten si el workflow
+    # fue lanzado usando main como ref.
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+
+    runs-on: ubuntu-latest
+
+    # GitHub usara los secrets/vars del environment correspondiente.
+    # Ambos environments usan LOS MISMOS NOMBRES de secrets, pero valores distintos:
+    # staging:    FTP_HOST / FTP_USERNAME / FTP_PASSWORD / APP_ENV_FILE
+    # production: FTP_HOST / FTP_USERNAME / FTP_PASSWORD / APP_ENV_FILE
+    environment:
+      name: ${{ github.event_name == 'push' && 'staging' || 'production' }}
+
+    # Evita dos despliegues simultaneos al mismo entorno.
+    concurrency:
+      group: siteground-${{ github.event_name == 'push' && 'staging' || 'production' }}
+      cancel-in-progress: false
+
+    env:
+      FTP_HOST: ${{ secrets.FTP_HOST }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      APP_ENV_FILE: ${{ secrets.APP_ENV_FILE }}
+      FTP_PORT: ${{ vars.FTP_PORT || '21' }}
+      FTP_REMOTE_DIR: ${{ vars.FTP_REMOTE_DIR }}
+
+    steps:
+      - name: Checkout del codigo a desplegar
+        uses: actions/checkout@v7
+        with:
+          # En push se despliega exactamente el commit que disparo el workflow.
+          # En deploy manual se fuerza el contenido actual de main.
+          ref: ${{ github.event_name == 'workflow_dispatch' && 'main' || github.sha }}
+          persist-credentials: false
+
+      # La version de pnpm se toma de package.json, por ejemplo:
+      #   "packageManager": "pnpm@10.18.3"
+      # De esta forma CI usa la misma version que el proyecto.
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ vars.NODE_VERSION || '22' }}
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      # Si existe un script "build" en package.json lo ejecuta.
+      # Si no existe, el deploy continua normalmente.
+      - name: Compilar proyecto
+        run: pnpm run --if-present build
+
+      - name: Instalar cliente FTP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp rsync
+
+      - name: Validar configuracion
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${FTP_HOST:?Falta el secret FTP_HOST}"
+          : "${FTP_USERNAME:?Falta el secret FTP_USERNAME}"
+          : "${FTP_PASSWORD:?Falta el secret FTP_PASSWORD}"
+          : "${APP_ENV_FILE:?Falta el secret APP_ENV_FILE}"
+          : "${FTP_REMOTE_DIR:?Falta la variable FTP_REMOTE_DIR}"
+
+      - name: Preparar paquete de deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf _deploy
+          mkdir -p _deploy
+
+          # Copia solo lo que realmente debe llegar al servidor.
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='node_modules/' \
+            --exclude='_deploy/' \
+            ./ _deploy/
+
+          # El contenido cambia automaticamente segun el environment
+          # (staging o production) configurado en GitHub.
+          printf '%s\n' "$APP_ENV_FILE" > _deploy/.env
+
+      - name: Sincronizar con SiteGround por FTPES
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          lftp <<EOF_LFTP
+          set cmd:fail-exit yes
+          set net:max-retries 3
+          set net:timeout 30
+
+          # FTP explicito sobre TLS (FTPES), normalmente sobre puerto 21.
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate yes
+
+          open -p "$FTP_PORT" -u "$FTP_USERNAME","$FTP_PASSWORD" "ftp://$FTP_HOST"
+
+          # --delete hace que el destino sea un espejo del paquete local:
+          # elimina del servidor archivos que ya no existen en el deploy.
+          mirror --reverse --delete --verbose --parallel=4 --no-perms \
+            "_deploy/" "$FTP_REMOTE_DIR"
+
+          bye
+          EOF_LFTP
