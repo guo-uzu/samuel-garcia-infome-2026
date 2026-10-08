@@ -70,10 +70,10 @@ export const siteConfig = {
       urlMobile: null,
     } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
     "espacios-publicos": {
-      status: "ready",
-      url: "https://youtu.be/2CUTIhS_FRA",
+      status: "coming-soon",
+      url: null,
       poster: null,
-      urlMobile: "https://youtube.com/shorts/t5F-kRAo_mM",
+      urlMobile: null,
     }  satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
     "medio-ambiente": {
       status: "coming-soon",
