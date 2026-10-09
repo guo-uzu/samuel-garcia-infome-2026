@@ -82,10 +82,10 @@ export const siteConfig = {
       urlMobile: null,
     } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
     salud: {
-      status: "coming-soon",
-      url: null,
-      poster: null,
-      urlMobile: null,
+      status: "ready",
+      url: "https://youtu.be/YByEYXvj6rU",
+      poster: "",
+      urlMobile: "https://youtube.com/shorts/jb_9nQS2gSI?si=K1wf6nJj-TFVPjTz",
     } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
     seguridad: {
       status: "coming-soon",
