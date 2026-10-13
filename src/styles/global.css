@@ -412,11 +412,36 @@ html:has(.site-menu__dialog[open]) {
 	aspect-ratio: 16 / 9;
 	border: 0;
 }
-.hero__youtube__mobile {
+
+.hero__youtube__mobile,
+.hero__youtube__live {
     aspect-ratio: 9/16;
     max-height: 850px;
     margin: 0 auto;
+}
 
+.live__container {
+  padding-inline: var(--gutter);
+}
+
+.hero__youtube__live {
+  aspect-ratio: 16/9;
+  box-shadow: 10px 0px 30px var(--color-gray-light);
+}
+
+.book__container {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.book__subtitle {
+  font-family: var(--font-body);
+  color: var(--color-gray-dark);
+  font-weight: initial;
+  font-size: var(--font-size-md);
 }
 
 .hero__etiqueta {
@@ -1077,7 +1102,8 @@ html:has(.site-menu__dialog[open]) {
     padding-top: 30px;
 }
 
-.report__return{
+.report__return,
+.book_redirect_btn {
     background-color: var(--color-orange);
     display: flex;
     flex-direction: row;
@@ -1090,6 +1116,10 @@ html:has(.site-menu__dialog[open]) {
     max-width: fit-content;
     padding: var(--space-xs) var(--space-md);
     border-radius: var(--radius-md) 0;
+}
+
+.book_redirect_btn {
+  text-decoration: underline !important;
 }
 
 .report__return svg {

@@ -58,23 +58,23 @@ export const siteConfig = {
       urlMobile: null,
     } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
     capullos: {
-      status: "coming-soon",
-      url: null,
+      status: "ready",
+      url: "https://www.youtube.com/watch?v=RVjC_bsy9vs",
       poster: null,
-      urlMobile: null,
+      urlMobile: "https://www.youtube.com/shorts/ckXC7z_hWCM",
     } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
     economia: {
       status: "coming-soon",
-      url: null,
+      url: "https://www.youtube.com/watch?v=Gp2ZhQEbxOM",
       poster: null,
-      urlMobile: null,
+      urlMobile: "",
     } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
     "espacios-publicos": {
       status: "coming-soon",
       url: null,
       poster: null,
       urlMobile: null,
-    }  satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
+    } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
     "medio-ambiente": {
       status: "coming-soon",
       url: null,
@@ -94,6 +94,11 @@ export const siteConfig = {
       urlMobile: null,
     } satisfies ResourceLink & { poster: string | null, urlMobile: string | null },
   },
+  live: {
+    status: "coming-soon",
+    url: "https://www.youtube.com/watch?v=tRsQsTMvPNg"
+  },
+  book: null,
   download: {
     status: "coming-soon",
     url: null,

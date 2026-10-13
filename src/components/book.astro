@@ -1,0 +1,12 @@
+  ---
+  import { siteConfig } from "../config/site";
+  const { book } = siteConfig
+---
+  {
+  book ? (
+    <div class="container projects__header book__container">
+      <h2 class="book__subtitle">¿Te interesa saber más? Descarga el libro del Quinto Informe</h2>
+      <a target="_blank" href={book} class="report__return book_redirect_btn">Samuel García. Quinto Informe</a>
+    </div>
+  ) : null
+  }

@@ -1,0 +1,16 @@
+---
+import { YouTube } from "@astro-community/astro-embed-youtube";
+import { siteConfig } from "../config/site";
+const {live} = siteConfig
+import Book from "../components/book.astro"
+---
+<section class="intro">
+  <div class="container projects__header">
+      <h2 class="projects__title">PRESENTACIÓN DEL INFORME</h2>
+      <p class="projects__subtitle">¡Únete a la transmisión!</p>
+  </div>
+  <div class="live__container">
+    <YouTube class="hero__youtube__live" id={live.url ?? ""} posterQuality="high"/>
+  </div>
+  <Book/>
+</section>
