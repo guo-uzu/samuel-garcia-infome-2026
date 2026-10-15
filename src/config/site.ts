@@ -98,7 +98,7 @@ export const siteConfig = {
     status: "coming-soon",
     url: "https://www.youtube.com/watch?v=tRsQsTMvPNg"
   },
-  book: null,
+  book: "https://www.nl.gob.mx/quinto-informe-2026",
   download: {
     status: "coming-soon",
     url: null,
